@@ -76,7 +76,7 @@ export default function LandingSection() {
         <div className="z-20 flex flex-col w-full max-md:ml-0 max-md:w-full">
           <div className="box-border flex relative flex-col shrink-0 mt-48 mb-0">
             <div className="flex gap-5 max-md:flex-col max-md:gap-0">
-              <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
+              <div className="flex flex-col w-full -mt-36 max-md:ml-0 max-md:w-full">
                 <div ref={(el) => childRefs.current[0] = el} className="box-border relative shrink-0 mt-5 h-auto">
                   <font color="#ffffff">Professional Laundry Service</font>
                 </div>

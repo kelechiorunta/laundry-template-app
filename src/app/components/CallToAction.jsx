@@ -8,7 +8,7 @@ export default function CallToAction() {
     <div className="box-border flex relative flex-col shrink-0 gap-0 justify-between p-5 mt-px mr-0 mb-24 bg-white bg-center bg-no-repeat bg-cover rounded bg-[url(https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2F1564e10fd3114891b49510fda87c6e9d?format=webp)]">
       <div className="flex gap-5 max-lg:flex-col max-md:gap-0">
         <div className="flex flex-col  w-6/12 max-md:ml-0 max-lg:w-full">
-          <div className="box-border flex relative flex-col shrink-0 pt-8 pr-8 pb-16 pl-16 mt-5 w-auto min-h-[394px] max-h-[400px] max-w-full text-white bg-sky-950 bg-opacity-50">
+          <div className="box-border flex relative flex-col shrink-0 pt-8 pr-8 pb-16 pl-16 mt-5 w-auto min-h-[394px] max-h-[500px] max-w-full text-white bg-sky-950 bg-opacity-50">
             <div className="flex gap-5 max-lg:flex-col max-md:gap-0">
               <div className="flex flex-col w-full max-md:ml-0 max-lg:w-full">
                 <div className="box-border relative shrink-0 mt-5 h-auto text-base leading-6 text-white">
