@@ -1,6 +1,6 @@
 import Image from "next/image";
 import LandingSection from "./components/LandingSection";
-import MainHeader from "./components/MainHeader";
+// import MainHeader from "./components/MainHeader";
 import OurPromise from "./components/OurPromise";
 import About from "./components/About";
 import DiscoverService from "./components/DiscoverService";
