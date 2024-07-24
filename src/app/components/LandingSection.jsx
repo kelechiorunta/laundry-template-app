@@ -2,12 +2,16 @@
 import * as React from "react";
 import { gsap, ScrollTrigger } from "gsap/all";
 import { useEffect, useRef } from "react";
+import { FaCalendarAlt, FaArrowRight} from "react-icons/fa";
+import { useRouter } from "next/navigation";
 
 gsap.registerPlugin(ScrollTrigger)
 
 export default function LandingSection() {
   const triggerRef = useRef(null);
   const childRefs = useRef([]);
+
+  const router = useRouter()
 
 //   const imageRef = useRef(null)
 
@@ -208,7 +212,8 @@ export default function LandingSection() {
                   <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                     <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
                       <button
-                        className="box-border relative shrink-0 p-5 mx-auto mt-5 leading-6 text-center bg-blue-600 rounded appearance-none cursor-pointer text-[white] w-[212.4px]"
+                        className="box-border relative shrink-0 p-5 mx-auto mt-5 leading-6 text-center
+                         bg-blue-600 rounded appearance-none cursor-pointer text-[white] w-[212.4px]  hover:bg-white hover:text-blue-600 transition-all"
                         onClick={(event) => {
                           /**
                            * Global objects available in custom action code:
@@ -220,20 +225,23 @@ export default function LandingSection() {
                            * Learn more: https://www.builder.io/c/docs/guides/custom-code
                            *
                            */
-                          alert("hello");
+                          router.push('/dashboard')
+                          // alert("hello");
                         }}
                         // openLinkInNewTab={false}
                       >
-                        Pickup Now
+                        <div className="flex items-center justify-center gap-x-4"><FaCalendarAlt/> Pickup Now</div>
                       </button>
                     </div>
                     <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
                       <button
-                        className="box-border relative shrink-0 p-5 mx-auto mt-5 leading-6 text-center text-blue-600 bg-white rounded border border-blue-600 border-solid appearance-none cursor-pointer w-[212.4px]"
+                        className="box-border relative shrink-0 p-5 mx-auto mt-5 leading-6 text-center text-blue-600 bg-white rounded border
+                         border-blue-600 border-solid appearance-none cursor-pointer w-[212.4px] hover:bg-blue-600 hover:text-white transition-all"
                         // openLinkInNewTab={false}
                         onClick={()=>alert("Discover More")}
                       >
-                        Discover More
+                        <div className="flex items-center justify-center gap-x-4">Discover More <FaArrowRight/></div>
+                        
                       </button>
                     </div>
                   </div>

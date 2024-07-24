@@ -11,15 +11,20 @@ import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
 // import { auth } from "../firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { FaSpinner } from "react-icons/fa";
-import { useTransition } from "react";
+import { useTransition, useContext } from "react";
 import { app } from "../firebase/firebaseConfig";
+import { authContext } from "./AuthComponent";
 
 
 export default function LaundryHeader() {
+  const authO = useContext(authContext)
+
+  const { user } = authO
+
   const auth = getAuth(app)
 
   const [isauth, setAuth] = useState(null)
-  const [user, setUser] = useState(null)
+  // const [user, setUser] = useState(null)
   const [isPending, startTransition] = useTransition()
   const [isPendingProfile, startTransitionProfile] = useTransition()
   const [isPendingAuth, startTransitionAuth] = useTransition()
@@ -46,18 +51,18 @@ export default function LaundryHeader() {
   },[ auth]) // i removed isauth from the dependency for performance issues
 
 
-  useEffect(()=>{
+  // useEffect(()=>{
     
-    const getcurrentUser = () =>{
-      startTransitionProfile(async()=>{
-        onAuthStateChanged(auth, (currentUser) => {
-          setUser(currentUser); 
-        });
-      })
+  //   const getcurrentUser = () =>{
+  //     startTransitionProfile(async()=>{
+  //       onAuthStateChanged(auth, (currentUser) => {
+  //         setUser(currentUser); 
+  //       });
+  //     })
       
-    }
-    getcurrentUser()
-  },[])
+  //   }
+  //   getcurrentUser()
+  // },[])
 
   const clearAuth = async() =>{
     startTransition(async()=>{
@@ -81,7 +86,7 @@ export default function LaundryHeader() {
 
   return (
     <div
-      className="w-full h-full box-border flex sticky top-0 z-20 flex-col shrink-0 px-5 bg-white border-black border-solid min-h-[50px]"
+      className="w-full h-full box-border flex sticky top-0 z-20 flex-col shrink-0 px-5 bg-white shadow-md border-black border-solid min-h-[50px]"
       // maxWidth={1200}
       // lazyLoad={false}
     >
@@ -104,7 +109,7 @@ export default function LaundryHeader() {
                       href="/"
                       className="box-border relative shrink-0 mx-auto mt-5 h-auto cursor-pointer pointer-events-auto"
                     >
-                      Home
+                      HOME
                     </a>
                   </div>
                   <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
@@ -112,15 +117,15 @@ export default function LaundryHeader() {
                       href="/services"
                       className="box-border relative shrink-0 mx-auto mt-5 h-auto cursor-pointer pointer-events-auto"
                     >
-                      Services
+                      SERVICES
                     </a>
                   </div>
                   <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
                     <a
                       href="/about"
-                      className="box-border relative shrink-0 mx-auto mt-5 w-20 h-auto cursor-pointer pointer-events-auto"
+                      className="box-border relative shrink-0 mx-auto mt-5 w-24 h-auto cursor-pointer pointer-events-auto"
                     >
-                      About Us
+                      ABOUT US
                     </a>
                   </div>
                   <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
@@ -128,7 +133,7 @@ export default function LaundryHeader() {
                       href="/whychooseus"
                       className="box-border relative shrink-0 mx-auto mt-5 h-auto cursor-pointer pointer-events-auto"
                     >
-                      WhyChooseUs
+                      ARTICLES
                     </a>
                   </div>
                 </div>

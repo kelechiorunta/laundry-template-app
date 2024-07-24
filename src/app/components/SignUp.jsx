@@ -28,8 +28,10 @@ const Signup = () => {
         e.preventDefault()
       try{
         const { username, email, password } = credentials
+        auth.displayName = username
         const userCredential = await createUserWithEmailAndPassword (auth, email, password)
         const currentUser = userCredential.user
+        // currentUser.displayName = username
         const currentToken = await currentUser.getIdToken()
         const addedUser = {
           username,
