@@ -1,7 +1,7 @@
 'use client'
 import { FaUser, FaEnvelope, FaLock } from 'react-icons/fa';
 import { getUsers } from '../server actions/server actions';
-import { createUserWithEmailAndPassword, getAuth } from 'firebase/auth';
+import { createUserWithEmailAndPassword, getAuth, updateProfile } from 'firebase/auth';
 import { db } from '../firebase/firebaseConfig';
 import { getDocs, collection, setDoc, doc } from 'firebase/firestore';
 import { useEffect, useState } from 'react';
@@ -28,12 +28,18 @@ const Signup = () => {
         e.preventDefault()
       try{
         const { username, email, password } = credentials
-        auth.displayName = username
+       
         const userCredential = await createUserWithEmailAndPassword (auth, email, password)
         const currentUser = userCredential.user
+
+        await updateProfile(currentUser, {
+          displayName: username
+        })
+        
         // currentUser.displayName = username
         const currentToken = await currentUser.getIdToken()
         const addedUser = {
+          displayName: username,
           username,
           email,
           userId: currentUser.uid,

@@ -225,6 +225,8 @@ export default function LandingSection() {
                            * Learn more: https://www.builder.io/c/docs/guides/custom-code
                            *
                            */
+                          
+                          // window.location.href='/dashboard'
                           router.push('/dashboard')
                           // alert("hello");
                         }}

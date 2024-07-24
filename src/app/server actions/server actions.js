@@ -16,9 +16,9 @@ export async function getUsers(){
 
 export async function validateAuth(){
     const authUser = getAuth(app)
-    const user = authUser.currentUser
+    const user = authUser && authUser.currentUser
     
-    return user? user : null
+    return user? user.getIdToken() : user
 
 }
 

@@ -3,8 +3,8 @@
 // components/Dashboard.js
 import { FaUserCircle, FaSpinner } from 'react-icons/fa';
 import { useEffect, useState, useTransition, useContext } from 'react';
-import { getAuth, onAuthStateChanged, updateProfile } from 'firebase/auth';
-import { updateDoc, doc, collection } from 'firebase/firestore';
+import { getAuth, onAuthStateChanged, updatePhoneNumber, updateProfile } from 'firebase/auth';
+import { updateDoc, doc, collection, getDoc } from 'firebase/firestore';
 import { app, db } from '../firebase/firebaseConfig';
 import { authContext } from './AuthComponent';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -39,7 +39,7 @@ export default function Dashboard() {
             ...prevFormData,
             email: (user && user.email),
             name: (user && user.displayName),  
-            phone: (user && user.phone),
+            phone: (user && user.phoneNumber),
             photo: (user && user.photoURL),
             
               
@@ -48,6 +48,40 @@ export default function Dashboard() {
         }
         getcurrentUser()
       },[auth, userEmail])
+
+      // Trying to extract the phoneNumber from the user's database
+
+      useEffect(() => {
+        const getUsers = async () => {
+          startTransition(async () => {
+            try {
+              const authP = getAuth(app);
+              const userP = authP && authP.currentUser;
+              const userPid = userP && userP.uid;
+    
+              if (userPid) {
+                const userRef = doc(db, 'users', userPid);
+                const userRefsnapshot = await getDoc(userRef);
+                if (userRefsnapshot.exists()) {
+                  const userData = userRefsnapshot.data();
+                  const { phone, phoneNumber } = userData;
+    
+                  setFormData(prevFormData => ({
+                    ...prevFormData,
+                    phone: phone || phoneNumber,
+                  }));
+                } else {
+                  console.error("No such document!");
+                }
+              }
+            } catch (err) {
+              console.error(err.message);
+            }
+          });
+        };
+        getUsers();
+      }, []);
+
 
       const handleProfileUpdate = async () => {
         startTransitionProfileUpdate(async () => {
@@ -61,6 +95,10 @@ export default function Dashboard() {
               phoneNumber: formData.phone,
               photoURL: `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
             });
+
+            // await updatePhoneNumber(authProfileUser, {
+            //   phoneNumber: formData.phone,
+            // })
     
             // Get the token for the current user
             const userid = await authProfileUser.uid;

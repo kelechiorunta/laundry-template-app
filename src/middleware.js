@@ -2,18 +2,21 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuth } from 'firebase/auth';
 import { app } from './app/firebase/firebaseConfig';
-import { authUserEmail } from './app/server actions/server actions';
+import { authUserEmail, validateAuth } from './app/server actions/server actions';
 import { cookies } from 'next/headers';
 
 export async function middleware(request) {
-  const user = await authUserEmail() //|| await getAuth(app);
+  const auth = getAuth(app)
+  const currentU = await auth.currentUser
+  const user = await validateAuth() //|| await getAuth(app);
 
   
   // Get the current user
-//   const user = auth && auth.currentUser;
+   const userA = await authUserEmail()//auth && auth.currentUser;
+   
 
   // If the user is not authenticated, redirect to the signup page
-  if (!user) {
+  if (!(userA)) {
     
     return NextResponse.redirect(new URL('/login', request.url));
   }

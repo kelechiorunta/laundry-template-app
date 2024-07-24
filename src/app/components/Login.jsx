@@ -1,9 +1,9 @@
 'use client'
 import { useState, useContext, useEffect } from 'react';
-import { auth } from '../firebase/firebaseConfig';
+import { app, auth } from '../firebase/firebaseConfig';
 import { signInWithEmailAndPassword, getAuth, signOut } from 'firebase/auth';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
-import { getLoginCredentials } from '../server actions/server actions';
+import { getLoginCredentials, validateAuth } from '../server actions/server actions';
 import axios from 'axios';
 import { useRouter } from 'next/navigation';
 import { closeSession } from '../server actions/server actions';
@@ -31,10 +31,14 @@ const Login = () => {
   const { authObject, setAuthObject } = authO
   const { status } = authObject
 
+  const [V, setV] = useState(null)
+
   useEffect(()=>{
     const revalidateAuth = async() => {
         const user = await authUserEmail()
+        const userV = await validateAuth()
         setActiveUser(user)
+        setV(userV)
     }
     revalidateAuth()
   },[])
@@ -44,7 +48,7 @@ const Login = () => {
       e.preventDefault();
     try {
         
-      const auth = getAuth()
+      const auth = getAuth(app)
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();
   
@@ -59,6 +63,7 @@ const Login = () => {
       console.log('User signed in');
       // console.log(token)
       console.log(await authUserEmail())
+      console.log(await validateAuth())
       window.location.href = '/'
       
           // Create a new NextResponse object and set the cookie

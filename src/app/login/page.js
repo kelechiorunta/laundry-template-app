@@ -17,7 +17,7 @@ export default function SignUpPage() {
   return (
     <div className='w-full flex flex-col h-full'>
         <LaundryHeader/>
-        <div className='loginOverlay w-screen h-full'>
+        <div className='loginOverlay w-full h-full'>
           <VideoBackground/>
           {/* {status && <p className=' absolute w-full text-right p-2'>{status}</p>} */}
           <Login/>
