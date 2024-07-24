@@ -8,9 +8,10 @@ import { cookies } from "next/headers"
 import { headers } from "next/headers"
 
 export async function getUsers(){
-    const registeredUsers = await axios.get('http://localhost:3003/api/signup')
-    const users = await registeredUsers.data
-    return users
+    // const registeredUsers = await axios.get('http://localhost:3003/api/signup')
+    // const users = await registeredUsers.data
+    // return users
+    return null
 }
 
 export async function validateAuth(){

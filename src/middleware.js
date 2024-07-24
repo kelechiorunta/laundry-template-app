@@ -1,23 +1,3 @@
-// import { NextRequest, NextResponse } from "next/server"
-// import { validateAuth } from "./app/server actions/server actions";
-// import { app } from "./app/firebase/firebaseConfig";
-// import { getAuth } from "firebase/auth";
-// import { onAuthStateChanged } from "firebase/auth";
-
-// export async function middleware(request){
-//     const activeUser = getAuth(app)//await validateAuth()
-//     // const user = activ //onAuthStateChanged(active)
-    
-//     if (activeUser.currentUser){
-//         return NextResponse.redirect(new URL('/signup', request.url));
-//     }
-//     console.log(activeUser)
-//     return NextResponse.next()
-// }
-
-// export const config = {
-//     matcher: ['/((?!_next/static|_next/image|favicon.ico|login|signup).*)'],
-//   };
 
 import { NextRequest, NextResponse } from 'next/server';
 import { getAuth } from 'firebase/auth';

@@ -7,46 +7,72 @@ import * as React from "react";
 import { authUserEmail } from "../server actions/server actions";
 import { closeSession } from "../server actions/server actions";
 import { useState, useEffect } from "react";
-import { signOut, getAuth } from "firebase/auth";
-import { auth } from "../firebase/firebaseConfig";
+import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
+// import { auth } from "../firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { FaSpinner } from "react-icons/fa";
 import { useTransition } from "react";
+import { app } from "../firebase/firebaseConfig";
+
 
 export default function LaundryHeader() {
+  const auth = getAuth(app)
 
   const [isauth, setAuth] = useState(null)
+  const [user, setUser] = useState(null)
   const [isPending, startTransition] = useTransition()
+  const [isPendingProfile, startTransitionProfile] = useTransition()
+  const [isPendingAuth, startTransitionAuth] = useTransition()
   const [isLoadingLogout, setIsLoadingLogout] = useState(false)
   const [isLoadingSignUp, setIsLoadingSignUp] = useState(false)
- 
+  const [active, setActive] = useState(false)
+
+  // startTransitionProfile(async()=>{
+  // onAuthStateChanged(auth, (currentUser) => {
+  //   setUser(currentUser); 
+  // });
+  // })
+
   const router = useRouter()
 
   useEffect(()=>{
     const getActiveAuth = async() => {
+     startTransitionAuth(async()=>{
       const activeauth = await authUserEmail()
       setAuth(activeauth)
-      
-      // 
+     }) 
     }
     getActiveAuth()
-  },[isauth, auth])
+  },[ auth]) // i removed isauth from the dependency for performance issues
 
+
+  useEffect(()=>{
+    
+    const getcurrentUser = () =>{
+      startTransitionProfile(async()=>{
+        onAuthStateChanged(auth, (currentUser) => {
+          setUser(currentUser); 
+        });
+      })
+      
+    }
+    getcurrentUser()
+  },[])
 
   const clearAuth = async() =>{
     startTransition(async()=>{
-      setIsLoadingLogout(true)
+      // setIsLoadingLogout(true)
     let timerId
     try{
       await signOut(auth); 
-      timerId = setTimeout(()=>{setIsLoadingLogout(false);},7000)
+      // timerId = setTimeout(()=>{setIsLoadingLogout(false);},7000)
     }
     catch(err){
       console.log(err)
     }
     finally{
-      timerId =setTimeout(()=>setIsLoadingLogout(false), 7000)
-      clearTimeout(timerId)
+      // timerId =setTimeout(()=>setIsLoadingLogout(false), 7000)
+      // clearTimeout(timerId)
       
     }
     })
@@ -118,7 +144,7 @@ export default function LaundryHeader() {
                           <Link
                             href={'/signup'}
                             className="box-border relative shrink-0 px-6 py-4 mt-5 text-center border border-[#1665F8] rounded appearance-none cursor-pointer bg-[white] text-[#1665F8] hover:bg-[#1665F8] transition-all hover:text-white "
-                            // openLinkInNewTab={false}
+                           
                             disabled={isLoadingSignUp}
                           >
                             {isLoadingSignUp? <FaSpinner className="animate-spin mx-auto"/> : 'Sign Up'}
@@ -132,16 +158,16 @@ export default function LaundryHeader() {
                       <div className="flex gap-5 max-md:flex-col max-md:gap-0">
 
                         
-                        {isauth && auth ? 
+                        {isauth && auth? 
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
                             <Link
-                            onClick={async()=>{ await clearAuth(); await closeSession(); window.location.href='/login'}}
+                            onClick={async()=>{ await clearAuth(); await closeSession(); window.location.href='/'}}
                             href={'/login'}
                             disabled={isPending}
-                              className="box-border relative shrink-0 px-6 py-4 mt-5 text-center rounded border border-[#1665F8] appearance-none cursor-pointer text-[white] bg-[#1665F8] hover:text-[#1665F8] transition-all hover:bg-white "
+                              className="box-border relative shrink-0 px-6 py-4 mt-5 w-[100px] text-center rounded border border-[#1665F8] appearance-none cursor-pointer text-[white] bg-[#1665F8] hover:text-[#1665F8] transition-all hover:bg-white "
                               // openLinkInNewTab={false}
                             >
-                              {isPending? <FaSpinner className="animate-spin mx-auto"/> : 'Logout'}
+                              {isPending ? <FaSpinner className="animate-spin mx-auto w-[20px] h-[20px]"/> : 'Logout'}
                               
                             </Link>
                           </div> :
@@ -154,6 +180,23 @@ export default function LaundryHeader() {
                               Login
                             </a>  
                         </div>}
+                          
+                        <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
+                            <a
+                            disabled={isPendingProfile}
+                            href={'/login'}
+                              className="user_profile box-border relative text-4xl flex items-center h-[50px] w-[50px] justify-center shrink-0 px-6 py-4 mt-7 rounded-full text-center border border-[#1665F8] appearance-none cursor-pointer text-[black] bg-[#1665F8] hover:text-[#1665F8] transition-all hover:bg-white "
+                              onMouseOver={()=>setActive(true)}
+                              onMouseOut={()=>setActive(false)}
+                              
+                            >
+                              {console.log(user &&  user)}
+                              {isPendingProfile? <FaSpinner className="animate-spin mx-auto fill-white w-[100%] h-[50px]"/> : `${user === null? "" : user && (user?.email) && (user?.email)[0].toUpperCase()}`}
+                              {<div className={`${active? 'animate' : 'unanimate'} overflow-hidden flex items-center absolute top-[110%] text-center border border-white rounded-2xl black bg-[#082f49] text-white`}>
+                                  <p className="w-auto relative text-[14px] text-center py-4 px-6 border border-black mx-auto rounded-xl text-white">{user && (user?.email) && (user?.email.toString().slice(0,7).toUpperCase())}</p>
+                              </div>}
+                            </a>  
+                        </div>
 
                       </div>
                     </div>

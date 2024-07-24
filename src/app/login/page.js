@@ -2,19 +2,27 @@
 import React from 'react'
 import LaundryHeader from '../components/LaundryHeader'
 import Login from '../components/Login'
-import { useContext } from 'react'
+import { useContext, useEffect } from 'react'
 import { authContext } from '../components/AuthComponent'
+import { gsap, ScrollTrigger } from 'gsap/all'
+import VideoBackground from '../components/VideoBackground'
 
+gsap.registerPlugin(ScrollTrigger)
 
 export default function SignUpPage() {
+
   const authO = useContext(authContext)
   const { authObject } = authO
   const { status } = authObject
   return (
-    <div className='w-full flex flex-col'>
+    <div className='w-full flex flex-col h-full'>
         <LaundryHeader/>
-        {status && <p className='w-full text-right p-2'>{status}</p>}
-        <Login/>
+        <div className='loginOverlay w-screen h-full'>
+          <VideoBackground/>
+          {/* {status && <p className=' absolute w-full text-right p-2'>{status}</p>} */}
+          <Login/>
+        </div>
+        
     </div>
   )
 }

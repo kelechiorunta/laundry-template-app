@@ -47,13 +47,19 @@ export default function LandingSection() {
         start: 'top 150px',
         end: 'bottom',
         onEnter: () => {
-          gsap.to(element, {
+         gsap.fromTo(element, {
+            x: -200, // Final position
+            opacity: 0, // Final opacity
+            duration: 2,
+            delay: index * 0.2, // Stagger the animations
+            stagger: 2
+          }, {
             x: 0, // Final position
             opacity: 1, // Final opacity
             duration: 2,
             delay: index * 0.2, // Stagger the animations
-            stagger: 0.5
-          });
+            stagger: 2
+          }, );
         },
         onLeaveBack: () => {
           gsap.to(element, {

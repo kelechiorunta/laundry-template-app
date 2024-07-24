@@ -76,6 +76,23 @@ body {
     }
   }
 
+  .user_profile{
+    -webkit-text-stroke: 1px white;
+    &:hover{
+      -webkit-text-stroke: 1px #1665F8;
+    }
+    /* color: black */
+  }
+
+  .animate{
+    height:auto;
+    transition: height 1s ease;
+  }
+
+  .unanimate{
+    height:0;
+    transition: height 1s ease;
+  }
 
   .landing{
     position: relative;

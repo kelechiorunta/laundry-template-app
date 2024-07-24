@@ -17,6 +17,9 @@ import { getAuth } from 'firebase/auth'
 
 // Your web app's Firebase configuration
 // For Firebase JS SDK v7.20.0 and later, measurementId is optional
+
+// USE THIS FOR LOCAL DEVELOPMENT
+
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -26,6 +29,22 @@ const firebaseConfig = {
   appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.NEXT_PUBLIC_MEASUREMENT_ID
 };
+
+
+// USE THIS FOR DEPLOYMENT
+
+// const firebaseConfig = {
+//   apiKey: "AIzaSyCBHioDX7Bo9lmsT3I680yKG2KVC5DabEc",//process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
+//   authDomain: "laundry-demo-app-4574a.firebaseapp.com", //process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
+//   projectId: "laundry-demo-app-4574a", //process.env.NEXT_PUBLIC_FIREBASE_PROJECT_ID,
+//   storageBucket: "laundry-demo-app-4574a.appspot.com", //process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+//   messagingSenderId: "876817904637",//process.env.FIREBASE_MESSAGING_SENDER_ID,
+//   appId: "1:876817904637:web:01f50f4880f06f168e9f94",//process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
+//   measurementId: "G-FWPWCMPSFN",//process.env.NEXT_PUBLIC_MEASUREMENT_ID
+// };
+
+
+
 // console.log("Initializing Firebase with config:", firebaseConfig);
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
