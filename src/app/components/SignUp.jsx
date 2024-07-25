@@ -9,8 +9,11 @@ import axios from 'axios';
 import { FaSpinner } from 'react-icons/fa';
 import { useTransition } from 'react';
 import { authUserEmail } from '../server actions/server actions';
+import { useRouter } from 'next/navigation';
+import { setCookie } from 'nookies';
 
 const Signup = () => {
+  const router = useRouter()
   const auth = getAuth()
   const [users, setUsers] = useState([])
   const [credentials, setCredentials] = useState({username: '', email:'', password: ''})
@@ -38,6 +41,15 @@ const Signup = () => {
         
         // currentUser.displayName = username
         const currentToken = await currentUser.getIdToken()
+
+        // const token = await userCredential.user.getIdToken();
+  
+      // Set the token in a cookie
+        setCookie(null, 'token', currentToken, {
+        maxAge: 30 * 24 * 60 * 60,
+        path: '/',
+      });
+
         const addedUser = {
           displayName: username,
           username,
@@ -50,6 +62,7 @@ const Signup = () => {
         
         console.log('User signed up and added to Firestore');
         
+        // router.push('/')
         window.location.href = '/';
       } catch (err) {
         // console.error('Error signing up:', err);

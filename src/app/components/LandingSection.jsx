@@ -226,8 +226,8 @@ export default function LandingSection() {
                            *
                            */
                           
-                          // window.location.href='/dashboard'
-                          router.push('/dashboard')
+                          window.location.href='/dashboard'
+                          //router.push('/dashboard')
                           // alert("hello");
                         }}
                         // openLinkInNewTab={false}

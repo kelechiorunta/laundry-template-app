@@ -11,19 +11,81 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function Dashboard() {
   const authO = useContext(authContext)
-  
   const { user } = authO
 
   const auth = getAuth(app)
- 
+  const [formData, setFormData] = useState({
+    name: '',
+    email: `${user && (user?.email)}` || '', //`${user && (user?.email).toString()}`,
+    address: '',
+    phone: '',
+    photo: null,
+    date: '',
+    pickuptime: '',
+    comments: '',
+    // photoURL: null,
+    });
+  
+    // const [phone, setPhone] = useState(null)
   
 
-  const [userEmail, setUserEmail ] = useState(null)
-  const [error, setError] = useState('')
-  const [isPending, startTransition] = useTransition()
-  const [isPendingProfileUpdate, startTransitionProfileUpdate] = useTransition()
-  const [isPendingUploadPic, startTransitionUploadPic] = useTransition()
-  const [active, setActive] = useState(user && (user?.email).toString())
+  const handleProfileUpdate = async (formData) => {
+    startTransitionProfileUpdate(async () => {
+      try {
+        const authProfile = getAuth(app);
+        const authProfileUser = authProfile.currentUser;
+        
+        // const { name, email, phone, address, } = formData
+        // Update profile in Firebase Authentication
+        await updateProfile(authProfileUser, {
+          displayName: formData && formData.name,
+          phoneNumber: formData && formData.phone,
+          photoURL: formData && `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
+        });
+
+        // Get the token for the current user
+        const userid = authProfileUser.uid;
+
+                  // Prepare the data for Firestore
+        const updateData = {
+          displayName: formData && formData.name ,
+          phone: formData && formData.phone ,
+          address: formData && formData.address || '',
+          date: formData && formData.date || '' ,
+          pickuptime: formData && formData.pickuptime || '' ,
+          comments: formData && formData.comments || '',
+          //photoURL: formData && `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
+        }
+        const photoData = {
+          photoURL: formData && `${formData.photo || photoURL}`
+        }
+        // Remove undefined values from updateData
+        // Object.keys(updateData).forEach(
+        //   (key) => updateData[key] === undefined && delete updateData[key]
+        // );
+
+
+        // Update profile in Firestore
+        const userRef = doc(db, 'users', userid);
+        await updateDoc(userRef, updateData);
+        // await updateDoc(userRef, photoData);
+
+        console.log(updateData, photoData)
+
+        alert("Updates Successful");
+      } catch (err) {
+        console.error(err.message);
+        alert("Unable to Update", err.message)
+        }
+      });
+    };
+
+    const [userEmail, setUserEmail ] = useState(null)
+    const [error, setError] = useState('')
+    const [isPending, startTransition] = useTransition()
+    const [isPendingProfileUpdate, startTransitionProfileUpdate] = useTransition()
+    const [isPendingUploadPic, startTransitionUploadPic] = useTransition()
+    // const [active, setActive] = useState(user && (user?.email).toString())
 
   
     useEffect(()=>{
@@ -34,22 +96,24 @@ export default function Dashboard() {
               setUserEmail(currentUser && currentUser.email); 
             });
           })
-          setActive(user && (user?.email).toString())
+          // setActive(user && (user?.email).toString())
           setFormData(prevFormData => ({
             ...prevFormData,
             email: (user && user.email),
             name: (user && user.displayName),  
-            phone: (user && user.phoneNumber),
+            // phone: (user && user.phoneNumber),
             photo: (user && user.photoURL),
             
               
           }));
-          setPhotoURL( user && user.photoURL)
+          // setPhotoURL( user && user.photoURL)
         }
         getcurrentUser()
       },[auth, userEmail])
 
       // Trying to extract the phoneNumber from the user's database
+
+      const [loading, setLoading] = useState(true)
 
       useEffect(() => {
         const getUsers = async () => {
@@ -64,11 +128,16 @@ export default function Dashboard() {
                 const userRefsnapshot = await getDoc(userRef);
                 if (userRefsnapshot.exists()) {
                   const userData = userRefsnapshot.data();
-                  const { phone, phoneNumber } = userData;
+                  const { phone, phoneNumber, address, comments, pickuptime, date, photoURL } = userData;
     
                   setFormData(prevFormData => ({
                     ...prevFormData,
                     phone: phone || phoneNumber,
+                    comments: comments,
+                    pickuptime: pickuptime,
+                    date: date,
+                    address: address,
+                    photoURL:photoURL || formData.photo
                   }));
                 } else {
                   console.error("No such document!");
@@ -77,65 +146,23 @@ export default function Dashboard() {
             } catch (err) {
               console.error(err.message);
             }
+            finally{
+              setLoading(false)
+            }
           });
         };
-        getUsers();
-      }, []);
+          getUsers();
+      }, [authO]);
 
 
-      const handleProfileUpdate = async () => {
-        startTransitionProfileUpdate(async () => {
-          try {
-            const authProfile = getAuth(app);
-            const authProfileUser = authProfile.currentUser;
-            
-            // Update profile in Firebase Authentication
-            await updateProfile(authProfileUser, {
-              displayName: formData.name,
-              phoneNumber: formData.phone,
-              photoURL: `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
-            });
-
-            // await updatePhoneNumber(authProfileUser, {
-            //   phoneNumber: formData.phone,
-            // })
-    
-            // Get the token for the current user
-            const userid = await authProfileUser.uid;
-    
-            // Update profile in Firestore
-            const userRef = doc(db, 'users', userid);
-            await updateDoc(userRef, {
-              displayName: formData.name,
-              phoneNumber: formData.phone,
-              photoURL: `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
-            });
-    
-            alert("Updates Successful");
-          } catch (err) {
-            console.error(err.message);
-            alert("Unable to Update", err.message)
-          }
-        });
-      };
-    
-
-  const [formData, setFormData] = useState({
-    name: '',
-    email: `${user && (user?.email)}` || '', //`${user && (user?.email).toString()}`,
-    phone: '',
-    photo: null,
-    date: '',
-    pickuptime: '',
-    comments: '',
-  });
-
+      
 
   const handleChange = (e) => {
     setFormData({
       ...formData,
       [e.target.name]: e.target.value,
     });
+    console.log(formData)
   };
 
   const [photoURL, setPhotoURL] = useState(null);
@@ -149,7 +176,7 @@ export default function Dashboard() {
         const storageRef = ref(storage, `profilePictures/${file.name}`);
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
-        setFormData({ ...formData, photo: downloadURL });
+        setFormData({ ...formData, photo: downloadURL});
       }
     })
     
@@ -161,16 +188,42 @@ export default function Dashboard() {
     console.log(formData);
   };
 
+  // // Prepare the data for Firestore
+  // const updateData = {
+  //   displayName: formData.name,
+  //   phone: formData.phone,
+  //   address: formData.address,
+  //   date: formData.date,
+  //   pickuptime: formData.pickuptime,
+  //   comments: formData.comments,
+  //   photoURL: `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
+  // }
+
+  // // Remove undefined values from updateData
+  // Object.keys(updateData).forEach(
+  //   (key) => updateData[key] === undefined && delete updateData[key]
+  // );
+
   return (
     
     <div className="dashboard min-h-screen bg-[#101010] p-4">
-      {console.log(user)}
+      {/* {console.log(user)} */}
+      {console.log(formData)}
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row bg-white p-6 rounded-lg shadow-lg">
         {/* Sidebar Profile Section */}
         <div className="md:w-1/3 p-4 border-r border-gray-200">
           <div className="flex items-center space-x-4 mb-6">
-            {formData.photo && <img className='rounded-full shadow-xl overflow-hidden bg-center object-fill max-w-[50px] max-h-[50px]' src={formData.photo} width={50} height={50} alt="Profile" /> ||
-            <FaUserCircle size={50} className="text-gray-700" />}
+          {formData.photo===null && (
+        <FaUserCircle size={50} className="text-gray-700 z-10" />
+      ) || (
+        <img
+          className='rounded-full shadow-xl overflow-hidden bg-center object-fill w-[50px] h-[50px]'
+          src={formData.photo}
+          width={50}
+          height={50}
+          alt="Profile"
+        />
+      )}
             <div>
               <h1 className="text-xl font-bold">{user && user?.displayName}</h1>
               {isPending? 
@@ -219,9 +272,20 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex flex-col">
+              <label className="mb-1 text-gray-700">Address</label>
+              <input
+                type="text"
+                name="address"
+                value={formData.address}
+                onChange={handleChange}
+                className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                required
+              />
+            </div>
+            <div className="flex flex-col">
               <label className="mb-1 text-gray-700">Phone</label>
               <input
-                type="tel"
+                type='text'
                 name="phone"
                 value={formData.phone}
                 onChange={handleChange}
@@ -276,7 +340,7 @@ export default function Dashboard() {
               }
               </div>
               {/* {photoURL && <img src={photoURL} alt="Profile Preview" />} */}
-              {console.log(photoURL)}
+              {/* {console.log(photoURL)} */}
               {formData.photo && <img src={formData.photo} alt="Profile" />}
             <div className='w-full flex items-center justify-center gap-x-4'>
               <button
@@ -286,7 +350,7 @@ export default function Dashboard() {
                 Schedule Pickup
               </button>
               <button
-              onClick={handleProfileUpdate}
+              onClick={()=>handleProfileUpdate(formData)}
               type="button"
               className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
               >

@@ -16,7 +16,7 @@ export async function middleware(request) {
    
 
   // If the user is not authenticated, redirect to the signup page
-  if (!(userA)) {
+  if (!(userA || user)) {
     
     return NextResponse.redirect(new URL('/login', request.url));
   }

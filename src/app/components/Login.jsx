@@ -63,7 +63,7 @@ const Login = () => {
       console.log('User signed in');
       // console.log(token)
       console.log(await authUserEmail())
-      console.log(await validateAuth())
+      // console.log(await validateAuth())
       window.location.href = '/'
       
           // Create a new NextResponse object and set the cookie

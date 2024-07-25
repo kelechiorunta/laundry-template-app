@@ -80,6 +80,12 @@ export default function LaundryHeader() {
     });
   };
 
+  const [toggle, setToggle] = useState(false)
+
+  const handleToggle = () =>{
+    setToggle(!toggle)
+  }
+
   const clearAuth = async() =>{
     // startTransition(async()=>{
       // setIsLoadingLogout(true)
@@ -118,13 +124,13 @@ export default function LaundryHeader() {
               <div className="box-border flex relative flex-col shrink-0 pr-2.5 mr-auto -ml-16 w-[500px] max-w-[700px] max-md:hidden max-sm:hidden">
                 <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                   <div className="flex flex-col w-3/12 max-md:ml-0 max-md:w-full">
-                    <a
+                    <Link
                       //onClick={()=>{window.location.href='/'}}
                       href="/"
                       className="box-border relative shrink-0 mx-auto mt-5 h-auto cursor-pointer pointer-events-auto"
                     >
                       HOME
-                    </a>
+                    </Link>
                   </div>
                   <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
                     <a
@@ -143,12 +149,12 @@ export default function LaundryHeader() {
                     </a>
                   </div>
                   <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
-                    <a
-                      href="/whychooseus"
+                    <Link
+                      href="/account"
                       className="box-border relative shrink-0 mx-auto mt-5 h-auto cursor-pointer pointer-events-auto"
                     >
-                      ARTICLES
-                    </a>
+                      ACCOUNT
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -203,23 +209,30 @@ export default function LaundryHeader() {
                         <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
                             {!(isauth)? <FaUserTag className="mt-6 rounded-full border shadow-lg" size={50}/>:
                             
-                            <Link
-                            onClick={async()=>{ clearAuth(); await closeSession(); window.location.href='/login'; console.log(user, isauth, auth)}}
+                            <button
+                            onClick={handleToggle}
+                            //onClick={async()=>{ clearAuth(); await closeSession(); window.location.href='/login'; console.log(user, isauth, auth)}}
                             disabled={isPendingProfile}
-                            href={'/login'}
-                              className="user_profile box-border relative text-4xl flex items-center h-[50px] w-[50px] justify-center shrink-0 px-6 py-4 mt-7 rounded-full text-center border border-[#1665F8] appearance-none cursor-pointer text-[black] bg-[#1665F8] hover:text-[#1665F8] transition-all hover:bg-white "
+                            // href={'/login'}
+                              className=" box-border relative text-4xl flex items-center h-[50px] w-[50px] justify-center shrink-0 px-6 py-4 mt-7 rounded-full text-center border border-[#1665F8] appearance-none cursor-pointer text-[black] hover:text-[#1665F8] transition-all"
                               onMouseOver={()=>setActive(true)}
                               onMouseOut={()=>setActive(false)}
                               
                             >
                               {console.log(user &&  user)}
-                              {isPendingProfile? <FaSpinner className="animate-spin mx-auto fill-white w-[100%] h-[50px]"/> : `${user === null? "" : user && (user?.email) && (user?.email)[0].toUpperCase()}`}
-                              {<div className={`${active? 'animate' : 'unanimate'} overflow-hidden flex items-center absolute top-[110%] text-center border border-white rounded-2xl black bg-[#082f49] text-white`}>
-                                  <p 
-                                  onClick={async()=>{ clearAuth(); await closeSession(); window.location.href='/login'}}
-                                  className="w-auto relative text-[14px] text-center py-4 px-6 border border-black mx-auto rounded-xl text-white">{user && (user?.email) && (user?.email.toString().slice(0,7).toUpperCase())}</p>
+                              {isPendingProfile? <FaSpinner className="animate-spin mx-auto fill-white w-[100%] h-[50px]"/>: //: `${user === null? "" : user && (user?.email) && (user?.email)[0].toUpperCase()}`}
+                              <div className={` flex items-center justify-center text-center border top-0 border-white rounded-2xl black bg-[#082f49] text-white`}>
+                                  {!toggle ? <img src={user && user.photoURL} className="absolute w-[50px] h-[50px] overflow-hidden rounded-full" width={50} height={50} alt="pic"/>
+                                  :
+                                  <p className="rounded-full px-5 py-3 absolute text-xl overflow-hidden bg-[#082f49]">{user && (user?.email) && (user?.email)[0].toUpperCase()}</p>
+                                  // :<p
+                                  //  onClick={handleToggle}
+                                  //onClick={async()=>{ clearAuth(); await closeSession(); window.location.href='/login'}}
+                                  // className="w-auto relative text-[14px] text-center py-4 px-6 border border-black mx-auto rounded-xl text-white"></p>
+                                  /* //{user && (user?.email) && (user?.email.toString().slice(0,7).toUpperCase())}</p> */
+                                  }
                               </div>}
-                            </Link>
+                            </button>
                               }  
                         </div>
 
