@@ -154,7 +154,7 @@ export default function LaundryHeader() {
                   <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
                     <Link
                       href="/account"
-                      className="box-border relative shrink-0 mx-auto mt-5 h-auto cursor-pointer pointer-events-auto"
+                      className={`${pathname==='/account' && 'active' } box-border relative shrink-0 mx-auto mt-5 h-auto cursor-pointer pointer-events-auto`}
                     >
                       ACCOUNT
                     </Link>

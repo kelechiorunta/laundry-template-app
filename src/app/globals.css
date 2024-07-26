@@ -164,6 +164,13 @@ body {
     }
   }
 
+  table, th, tr, td{
+    border-collapse: collapse;
+    box-sizing: border-box;
+    /* border: 1px solid; */
+    width: 100%;
+  }
+
 }
 
 

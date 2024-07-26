@@ -59,6 +59,7 @@ const Signup = () => {
         };
     
         await setDoc(doc(db, 'users', currentUser.uid), addedUser);
+        await setDoc(doc(db, 'pickups', currentUser.uid), {username, email});
         
         console.log('User signed up and added to Firestore');
         

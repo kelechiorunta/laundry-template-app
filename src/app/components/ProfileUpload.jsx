@@ -10,9 +10,10 @@ import 'react-loading-skeleton/dist/skeleton.css';
 import { useContext } from 'react';
 import { authContext } from './AuthComponent';
 
-const ProfileUpload = () => {
-  const authO = useContext(authContext)
+const ProfileUpload = ({user}) => {
+  //const authO = useContext(authContext)
   const [formData, setFormData] = useState(null);
+  const [pickupData, setPickupData] = useState(null);
   const [isPending, setIsPending] = useState(true);
 
   useEffect(() => {
@@ -25,12 +26,19 @@ const ProfileUpload = () => {
 
           if (userPid) {
             const userRef = doc(db, 'users', userPid);
+            const pickupRef = doc(db, 'pickups', userPid);
+            const pickupRefsnapshot = await getDoc(pickupRef);
             const userRefsnapshot = await getDoc(userRef);
 
             if (userRefsnapshot.exists()) {
               const data = userRefsnapshot.data();
               setFormData(data);
             }
+
+            if (pickupRefsnapshot.exists()) {
+                const pickupdata = pickupRefsnapshot.data();
+                setPickupData(pickupdata);
+              }
           }
         } catch (err) {
           console.error(err.message);
@@ -41,7 +49,7 @@ const ProfileUpload = () => {
     };
 
     fetchUserData();
-  }, [authO]);
+  }, [user]);
 
   return (
     <div className="p-4 w-full max-w-2xl mx-auto">
@@ -74,8 +82,42 @@ const ProfileUpload = () => {
             <p className="text-gray-600">{formData.email}</p>
             <p className="text-gray-600">{formData.phone}</p>
             {/* Add more user details here */}
+            {console.log(pickupData)}
+            {
+            pickupData &&
+             <table className='shadow-md p-4 border w-[40%]'> 
+                
+                <thead className='flex items-center shadow-md p-2 border-r'>
+                    {/* <tr><th className='w-full'>Name</th></tr> */}
+                    <tr className='border-r shadow-md pb-2 pl-2'><th className=''>Time</th></tr>
+                    <tr className='border-r shadow-md pb-2 pl-2'><th className=''>Date</th></tr>
+                </thead>
+
+                <tbody className='flex items-start shadow-md p-2 w-full'>
+
+                    {/* <tr><td>{pickupData.user}</td></tr>  */}
+                    
+                    <tr className='border-r pb-2 pl-2'>
+                        <td className='flex flex-col '>{pickupData.pickuptime.map((k)=>{
+                            return <li className='w-full' key={k}>{k.toString()}</li>
+                        })}
+                        </td>
+                    </tr>
+
+                    <tr className='border-r pb-2 pl-2'>
+                        <td className='flex flex-col '>{pickupData.pickupdate.map((d)=>{
+                            return <li className='w-full' key={d}>{d.toString()}</li>
+                        })}
+                        </td>
+                    </tr>
+
+                </tbody>
+            </table>                    
+            }
           </div>
         )
+
+        
       )}
     </div>
   );

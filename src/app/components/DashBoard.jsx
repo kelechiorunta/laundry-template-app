@@ -4,7 +4,7 @@
 import { FaUserCircle, FaSpinner } from 'react-icons/fa';
 import { useEffect, useState, useTransition, useContext } from 'react';
 import { getAuth, onAuthStateChanged, updatePhoneNumber, updateProfile } from 'firebase/auth';
-import { updateDoc, doc, collection, getDoc } from 'firebase/firestore';
+import { updateDoc, doc, collection, getDoc, setDoc, addDoc, arrayUnion, arrayRemove } from 'firebase/firestore';
 import { app, db } from '../firebase/firebaseConfig';
 import { authContext } from './AuthComponent';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -56,8 +56,12 @@ export default function Dashboard() {
           comments: formData && formData.comments || '',
           photoURL: formData && `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
         }
-        const photoData = {
-          photoURL: formData && `${formData.photo || photoURL}`
+        const pickupData = {
+          // photoURL: formData && `${formData.photo || photoURL}`,
+          user: formData && formData.name || '' ,
+          email: formData && formData.email || '' ,
+          pickupdate: [formData && formData.date ]|| '' ,
+          pickuptime: [formData && formData.pickuptime] || ''
         }
         // Remove undefined values from updateData
         // Object.keys(updateData).forEach(
@@ -67,10 +71,23 @@ export default function Dashboard() {
 
         // Update profile in Firestore
         const userRef = doc(db, 'users', userid);
-        await updateDoc(userRef, updateData);
-        // await updateDoc(userRef, photoData);
+        const taskRef = doc(db, 'pickups', userid);
+        
+        const taskRefSnapShot = await getDoc(taskRef)
 
-        console.log(updateData, photoData)
+        await updateDoc(userRef, updateData);
+       
+        if (taskRefSnapShot.exists()){
+          await updateDoc(taskRef, { pickuptime: arrayUnion(pickupData.pickuptime[0]) }) 
+          await updateDoc(taskRef, { pickupdate: arrayUnion(pickupData.pickupdate[0]) });
+        }
+        else{
+          await setDoc(taskRef, pickupData)
+
+        }
+        
+
+        console.log(updateData, pickupData)
 
         alert("Updates Successful");
       } catch (err) {
