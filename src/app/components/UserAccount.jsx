@@ -167,8 +167,8 @@ const UserAccount = () => {
   };
 
   return (
-    <div className="min-h-screen  mx-auto flex max-sm:flex-col bg-white p-6 rounded-lg shadow-lg">
-      <aside className="w-64 bg-gray-800 text-white flex-shrink-0 max-sm:w-full">
+    <div className="min-h-screen  mx-auto flex max-[900px]:flex-col bg-white p-6 rounded-lg shadow-lg">
+      <aside className="w-64 bg-gray-800 text-white flex-shrink-0 max-[900px]:w-full">
         <div className="p-4 flex flex-col items-center gap-4">
           {console.log(formData)}
         {formData.photo ? <img src={formData.photo} width={50} height={50} alt="Uploaded" className="rounded-full mt-4 w-[50px] h-[50px]" />:<FaUser size={40} />}
@@ -235,6 +235,21 @@ const Profile = ({user, isProfileActive, pickupData, formData, isPending, setFor
     // fetchUserData();
   
   }, [isProfileActive, formData.photoURL, authO])
+
+  function convert24To12(time24) {
+    const [hours, minutes] = time24.split(':');
+    const date = new Date();
+    date.setHours(parseInt(hours));
+    date.setMinutes(parseInt(minutes));
+  
+    const options = {
+      hour: 'numeric',
+      minute: 'numeric',
+      hour12: true
+    };
+  
+    return date.toLocaleString('en-US', options);
+  }
   
   return (
     <div className="p-4 w-full max-w-2xl mx-auto">
@@ -270,21 +285,22 @@ const Profile = ({user, isProfileActive, pickupData, formData, isPending, setFor
             {console.log(pickupData)}
             {
             pickupData &&
-             <table className='shadow-md p-4 border w-[60%]'> 
+             <table className='shadow-md p-4 border w-[100%] '> 
                 
-                <thead className='flex items-center shadow-md p-2 border-r'>
+                <thead className='flex items-center shadow-md p-2 border-r max-[450px]:flex-col'>
                     {/* <tr><th className='w-full'>Name</th></tr> */}
-                    <tr className='border-r shadow-md pb-2 pl-2'><th className=''>Time</th></tr>
-                    <tr className='border-r shadow-md pb-2 pl-2'><th className=''>Date</th></tr>
+                    <tr className='border-r shadow-md pb-2 pl-2'><th className='text-center w-full'>Time</th></tr>
+                    <tr className='border-r shadow-md pb-2 pl-2'><th className='text-center w-full'>Date</th></tr>
                 </thead>
 
-                <tbody className='flex items-start shadow-md p-2 w-full'>
+                <tbody className='flex items-start shadow-md p-2 w-full max-[450px]:flex-col'>
 
                     {/* <tr><td>{pickupData.user}</td></tr>  */}
                     
                     <tr className='border-r pb-2 pl-2'>
                         <td className='flex flex-col '>{pickupData.pickuptime.map((k)=>{
-                            return <li className='w-full' key={k}>{k.toString()}</li>
+
+                            return <li className='w-full' key={k}>{convert24To12(k)}</li>
                         })}
                         </td>
                     </tr>
