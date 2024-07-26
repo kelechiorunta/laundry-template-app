@@ -7,6 +7,7 @@ import { updateDoc, doc, collection, getDoc } from 'firebase/firestore';
 import { app, db } from '../firebase/firebaseConfig';
 import { authContext } from './AuthComponent';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import ProfileUpload from './ProfileUpload';
 // import 'tailwindcss/tailwind.css';
 
 const UserAccount = () => {
@@ -102,114 +103,17 @@ const UserAccount = () => {
         };
         getUsers();
       }, [authO]);
- 
-  // const [formData, setFormData] = useState({
-  //   name: '',
-  //   email: '',
-  //   phone: '',
-  //   date: '',
-  //   pickuptime: '',
-  //   comments: '',
-  //   photo: null
-  // });
 
-  // const [loading, setLoading] = useState(true);
-  // const [userEmail, setUserEmail ] = useState(null)
-
-  // // useEffect(()=>{
-        
-  // //   const getcurrentUser = () =>{
-      
-  // //     startTransition(async()=>{
-  // //       const auth = getAuth(app)
-  // //       onAuthStateChanged(auth, (currentUser) => {
-  // //         setUserEmail(currentUser && currentUser.email); 
-  // //       });
-  // //     })
-  // //     // setActive(user && (user?.email).toString())
-  // //     setFormData(prevFormData => ({
-  // //       ...prevFormData,
-  // //       email: (user && user.email),
-  // //       name: (user && user.displayName),  
-  // //       phone: (user && user.phoneNumber),
-  // //       photo: (user && user.photoURL),
-        
-          
-  // //     }));
-  // //     // setPhotoURL( user && user.photoURL)
-  // //   }
-  // //   getcurrentUser()
-  // // },[formData.photo])
-
-  // useEffect(() => {
-    
-  //   // const getUsers = async () => {
-      
-  //     startTransition(async () => {
-  //       try {
-  //         const authP = getAuth(app);
-  //         const userP = authP && authP.currentUser;
-  //         const userPid = userP && userP.uid;
-
-  //         if (userPid) {
-  //           const userRef = doc(db, 'users', userPid);
-  //           const userRefsnapshot = await getDoc(userRef);
-  //           if (userRefsnapshot.exists()) {
-  //             const userData = userRefsnapshot.data();
-  //             const { phone, phoneNumber, address, email, displayName, comments, pickuptime, photo, date, photoURL } = userData;
-
-  //             setFormData(prevFormData => ({
-  //               ...prevFormData,
-  //               phone: phone || phoneNumber,
-  //               comments: comments,
-  //               pickuptime: pickuptime,
-  //               date: date,
-  //               address: address,
-  //               photo: photoURL,
-  //               name: displayName,
-  //               email: email
-  //               //photoURL:photoURL || formData.photo
-  //             }));
-  //               // setLoading(false)
-              
-  //           } else {
-  //             console.error("No such document!");
-  //           }
-  //         }
-  //       } catch (err) {
-  //         console.error(err.message);
-  //       }
-  //       finally{
-  //         setLoading(false)
-          
-  //       }
-  //     });
-  //   // };
-   
-  //     // getUsers();
-  //     setSelectedTab(selectedTab)
-     
-    
-    
-  // }, []) //, selectedTab, formData.address, 
-  //   // formData.email, 
-  //   // formData.comments, 
-  //   // formData.name, 
-  //   // formData.photo,
-  //   // formData.date, 
-  //   // formData.phone, 
-  //   // formData.pickuptime]);
-
-  const renderContent = () => {
+  const renderContent = ({user}) => {
     switch (selectedTab) {
       case 'profile':
-        return <Profile />;
+        return <Profile user={user} />;
       case 'pickups':
         return <Pickups />;
       case 'registerWares':
         return <RegisterWares formData={formData} setFormData={setFormData} isPending={isPending}/>;
       default:
-        return <Profile />;
+        return <Profile user={user}/>;
     }
   };
 
@@ -241,17 +145,18 @@ const UserAccount = () => {
         </nav>
       </aside>
       <main className="flex-1 p-8 bg-gray-100">
-        {renderContent()}
+        {renderContent({user})}
       </main>
     </div>
   );
 };
 
-const Profile = () => {
+const Profile = ({user}) => {
   return (
     <div>
       <h2 className="text-2xl font-bold mb-4">Profile</h2>
-      <p>Profile content goes here...</p>
+      <p>Welcome {user && user.displayName}</p>
+      <ProfileUpload/>
       {/* Add more profile details and icons here */}
     </div>
   );

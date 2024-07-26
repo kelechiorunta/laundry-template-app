@@ -138,10 +138,29 @@ body {
       height: 100%;
       top: 0;
       left: 0;
-      background-color: rgba(0,0,0,0.1);
+      background-color: rgba(0,0,0,0.5);
       clip-path: polygon(0 0, 100% 0, 100% 55%, 0 93%);
       /* border: 3px solid black; */
       z-index: 10;
+    }
+  }
+
+  .active{
+    position: relative;
+    /* text-align: left; */
+    /* width: 100%; */
+    transition: all 2s ease;
+    &::before{
+      position: absolute;
+      content:'';
+      border: 1px solid black;
+      bottom: 0;
+      left:0;
+      background-color: black;
+      height:2px;
+      width: 100%;
+      transition: all 2s ease;
+      /* z-index: 10; */
     }
   }
 

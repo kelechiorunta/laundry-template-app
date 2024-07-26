@@ -15,9 +15,11 @@ import { FaSpinner } from "react-icons/fa";
 import { useTransition, useContext } from "react";
 import { app } from "../firebase/firebaseConfig";
 import { authContext } from "./AuthComponent";
+import { usePathname } from "next/navigation";
 
 
 export default function LaundryHeader() {
+  const pathname = usePathname()
   const authO = useContext(authContext)
 
   const { user } = authO
@@ -32,6 +34,7 @@ export default function LaundryHeader() {
   const [isLoadingLogout, setIsLoadingLogout] = useState(false)
   const [isLoadingSignUp, setIsLoadingSignUp] = useState(false)
   const [active, setActive] = useState(false)
+
 
   // startTransitionProfile(async()=>{
   // onAuthStateChanged(auth, (currentUser) => {
@@ -106,7 +109,7 @@ export default function LaundryHeader() {
 
   return (
     <div
-      className="w-full h-full box-border flex sticky top-0 z-20 flex-col shrink-0 px-5 bg-white shadow-md border-black border-solid min-h-[50px]"
+      className="w-full h-full box-border flex sticky top-0 z-30 flex-col shrink-0 px-5 bg-white shadow-md border-black border-solid min-h-[50px]"
       // maxWidth={1200}
       // lazyLoad={false}
     >
@@ -127,26 +130,26 @@ export default function LaundryHeader() {
                     <Link
                       //onClick={()=>{window.location.href='/'}}
                       href="/"
-                      className="box-border relative shrink-0 mx-auto mt-5 h-auto cursor-pointer pointer-events-auto"
+                      className={`${pathname==='/' && 'active' } box-border relative shrink-0 mx-auto mt-5 h-auto cursor-pointer pointer-events-auto`}
                     >
                       HOME
                     </Link>
                   </div>
                   <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
-                    <a
+                    <Link
                       href="/services"
-                      className="box-border relative shrink-0 mx-auto mt-5 h-auto cursor-pointer pointer-events-auto"
+                      className={`${pathname==='/services' && 'active' } box-border relative shrink-0 mx-auto mt-5 h-auto cursor-pointer pointer-events-auto`}
                     >
                       SERVICES
-                    </a>
+                    </Link>
                   </div>
                   <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
-                    <a
+                    <Link
                       href="/about"
-                      className="box-border relative shrink-0 mx-auto mt-5 w-24 h-auto cursor-pointer pointer-events-auto"
+                      className={`${pathname==='/about' && 'active' } box-border relative shrink-0 mx-auto mt-5 w-24 h-auto cursor-pointer pointer-events-auto`}
                     >
                       ABOUT US
-                    </a>
+                    </Link>
                   </div>
                   <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
                     <Link

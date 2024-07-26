@@ -54,7 +54,7 @@ export default function Dashboard() {
           date: formData && formData.date || '' ,
           pickuptime: formData && formData.pickuptime || '' ,
           comments: formData && formData.comments || '',
-          //photoURL: formData && `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
+          photoURL: formData && `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
         }
         const photoData = {
           photoURL: formData && `${formData.photo || photoURL}`
@@ -75,7 +75,7 @@ export default function Dashboard() {
         alert("Updates Successful");
       } catch (err) {
         console.error(err.message);
-        alert("Unable to Update", err.message)
+        alert("Unable to Update: Please ensure your details are complete", err.message)
         }
       });
     };
@@ -177,6 +177,7 @@ export default function Dashboard() {
         await uploadBytes(storageRef, file);
         const downloadURL = await getDownloadURL(storageRef);
         setFormData({ ...formData, photo: downloadURL});
+        setPhotoURL(downloadURL)
       }
     })
     
@@ -246,11 +247,11 @@ export default function Dashboard() {
         </div>
 
         {/* Main Content Section */}
-        <div className="md:w-2/3 p-4">
+        <div className="bg-[rgba(0,0,255,0.2)] bg-contain bg-[url('../../public/imgs/bg_memphis.png')] md:w-2/3 p-4">
           <h2 className="text-2xl font-semibold mb-4">Schedule a Pickup</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col">
-              <label className="mb-1 text-gray-700">Name</label>
+              <label className="font-bold mb-1 text-gray-700">Name</label>
               <input
                 type="text"
                 name="name"
@@ -261,7 +262,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 text-gray-700">Email</label>
+              <label className="font-bold mb-1 text-gray-700">Email</label>
               <input
                 type="email"
                 name="email"
@@ -272,7 +273,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 text-gray-700">Address</label>
+              <label className="font-bold mb-1 text-gray-700">Address</label>
               <input
                 type="text"
                 name="address"
@@ -283,7 +284,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 text-gray-700">Phone</label>
+              <label className="font-bold mb-1 text-gray-700">Phone</label>
               <input
                 type='text'
                 name="phone"
@@ -294,7 +295,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 text-gray-700">Date</label>
+              <label className="font-bold mb-1 text-gray-700">Date</label>
               <input
                 type="date"
                 name="date"
@@ -305,7 +306,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 text-gray-700">Pickup Time</label>
+              <label className="font-bold mb-1 text-gray-700">Pickup Time</label>
               <input
                 type="time"
                 name="pickuptime"
@@ -316,7 +317,7 @@ export default function Dashboard() {
               />
             </div>
             <div className="flex flex-col">
-              <label className="mb-1 text-gray-700">Comments</label>
+              <label className="font-bold mb-1 text-gray-700">Comments</label>
               <textarea
                 name="comments"
                 value={formData.comments}
@@ -325,7 +326,7 @@ export default function Dashboard() {
               />
             </div>
             <div>
-                <label className="block text-sm font-medium text-gray-700">Photo</label>
+                <label className="font-bold block text-sm text-gray-700">Photo</label>
               {
                 isPendingUploadPic? 
                     <FaSpinner className="animate-spin mx-auto text-black"/> 
