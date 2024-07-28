@@ -129,8 +129,8 @@ const Login = () => {
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6">Log In</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
-        {console.log(V)}
-        {isPending? <h1>Loading...</h1> : <p>{V}</p>}
+        {/* {console.log(V)} */}
+        {/* {isPending? <h1>Loading...</h1> : <p>{V}</p>} */}
         {/* {status && <p className="text-blue-500 text-center">{status}</p>} */}
         <form onSubmit={handleLogin} 
         //action={getLoginCredentials}

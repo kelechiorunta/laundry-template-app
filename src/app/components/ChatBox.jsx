@@ -199,6 +199,7 @@ const ChatBox = ({ email }) => {
 
   return (
         <div className="flex flex-col h-screen p-4 bg-gray-100">
+            <h1 className='font-extrabold py-4 '>{authUser && authUser.displayName.toUpperCase()} is ready to chat and connect with {recipientUser && recipientUser.displayName.toUpperCase()}</h1>
           <div className="flex flex-col flex-grow p-4 bg-white shadow-lg rounded-lg overflow-hidden">
           {isPending ? (
             <div className="animate-pulse">
@@ -219,20 +220,15 @@ const ChatBox = ({ email }) => {
               className={`flex ${msg.senderId === authUser.uid ? 'justify-end' : 'justify-start'} mb-2`}
             >
               <div className="p-2 rounded-lg shadow-lg">
+              {msg.senderId === authUser.uid ? <div><img src={authUser.photoURL} width={50} height={50} className='w-[50px] h-[50px] rounded-full' alt='S'/> {authUser.displayName}</div>
+              :  <div><img src={recipientUser.photoURL} width={50} height={50} className='w-[50px] h-[50px] rounded-full' alt='R'/> {recipientUser.displayName}</div>}
+
                 <p className={`${msg.senderId === authUser.uid ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'} p-2 rounded-lg`}>{msg.text}</p>
               </div>
             </div>
           ))}
          </div>)
 }
-            {/* // <div className="flex flex-col flex-grow overflow-y-auto mb-4">
-            //   {messages.map(({ id, text }) => (
-            //     <div key={id} className="flex items-center mb-2">
-            //       <FaUserCircle className="text-gray-600" size={24} />
-            //       <p className="ml-2 p-2 bg-gray-200 rounded-lg">{text}</p>
-            //     </div>
-            //   ))}
-            // </div>)} */}
             
             <form onSubmit={sendMessage} className="flex items-center">
               <input

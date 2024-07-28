@@ -13,7 +13,8 @@
 import { useState } from 'react';
 // import { useRouter } from 'next/router';
 import { useRouter } from 'next/navigation';
-import Modal from '../components/Modal';
+// import Modal from '../components/Modal';
+import Modal from '@/app/components/Modal';
 import ChatBox from '@/app/components/ChatBox';
 
 export default function Page(){
@@ -44,7 +45,7 @@ export default function Page(){
         Go to About
       </button>
       <Modal
-        isOpen={true}
+        isOpen={isModalOpen}
         onClose={() => setModalOpen(false)}
         onConfirm={confirmNavigation}
       >
