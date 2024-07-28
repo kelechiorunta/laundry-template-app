@@ -16,6 +16,8 @@ import { useTransition, useContext } from "react";
 import { app } from "../firebase/firebaseConfig";
 import { authContext } from "./AuthComponent";
 import { usePathname } from "next/navigation";
+import logo from '../../../public/imgs/logo_laundry.png'
+import Image from "next/image";
 
 
 export default function LaundryHeader() {
@@ -120,18 +122,19 @@ export default function LaundryHeader() {
 
   return (
     <div
-      className="w-full h-full box-border flex sticky top-0 z-30 flex-col shrink-0 px-5 bg-white shadow-md border-black border-solid min-h-[50px]"
+      className="bg-gray-900 w-full h-full box-border flex sticky top-0 z-30 flex-col shrink-0 px-5 shadow-md border-black border-solid min-h-[50px]"
       // maxWidth={1200}
       // lazyLoad={false}
     >
-      <section className="sticky top-0 z-20 box-border flex-col grow shrink-0 self-stretch px-5 pb-2 mx-auto w-full bg-white border-black border-solid max-w-[1400px] min-h-[50px]">
+      <section className="sticky top-0 z-20 box-border flex-col grow shrink-0 self-stretch px-5 pb-2 mx-auto w-full shadow-2xl bg-gray-900 text-white border-black border-solid max-w-[1400px] min-h-[50px]">
         <div className="box-border flex relative flex-col shrink-0 mt-2 mr-auto w-full">
           <div className="flex gap-5 sticky top-0 z-20 max-md:flex-col max-md:gap-0">
             <div className="flex flex-col w-3/12 max-md:ml-0 max-md:w-full">
-              <img
+              <Image
+                src={logo}
                 loading="lazy"
-                srcSet="https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=100 100w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=200 200w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=400 400w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=800 800w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=1200 1200w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=1600 1600w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=2000 2000w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded"
-                className="box-border object-cover overflow-hidden shrink-0 mt-0 mb-auto aspect-square h-[70px] min-h-[20px] min-w-[20px] w-[70px] max-md:w-16 max-md:h-16"
+                // srcSet="https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=100 100w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=200 200w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=400 400w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=800 800w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=1200 1200w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=1600 1600w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=2000 2000w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded"
+                className="box-border rounded-full object-cover overflow-hidden shrink-0 mt-0 mb-auto aspect-square h-[70px] min-h-[70px] min-w-[70px] w-[70px] max-md:w-16 max-md:h-16"
               />
             </div>
             <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">

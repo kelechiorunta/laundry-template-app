@@ -81,9 +81,9 @@ export default function AuthComponent({children}) {
         }
           
             
-
+          var interval = 30 * 24 * 60 * 60
         
-          const timerid = setTimeout(validateAuth, 20000)
+          const timerid = setTimeout(validateAuth, interval )
 
           return () =>{
             clearTimeout(timerid)

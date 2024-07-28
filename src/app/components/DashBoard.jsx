@@ -8,6 +8,7 @@ import { updateDoc, doc, collection, getDoc, setDoc, addDoc, arrayUnion, arrayRe
 import { app, db } from '../firebase/firebaseConfig';
 import { authContext } from './AuthComponent';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const authO = useContext(authContext)
@@ -253,11 +254,11 @@ export default function Dashboard() {
           <ul className="space-y-4">
             <li className="flex items-center space-x-2">
               <FaUserCircle size={20} className="text-gray-500" />
-              <span>Profile</span>
+              <Link href={'/account'}><span>Profile</span></Link>
             </li>
             <li className="flex items-center space-x-2">
               <FaUserCircle size={20} className="text-gray-500" />
-              <span>Pickups</span>
+              <Link href={'/account#pickups'}><span>Pickups</span></Link>
             </li>
             {/* Add more sidebar items here */}
           </ul>

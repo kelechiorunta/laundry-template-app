@@ -1,15 +1,16 @@
 'use client'
 import React, { useState } from 'react';
-import { FaUser, FaTruck, FaTshirt, FaSpinner } from 'react-icons/fa';
+import { FaUser, FaTruck, FaTshirt, FaSpinner, FaConnectdevelop, FaEnvelopeOpenText } from 'react-icons/fa';
 import { useEffect, useTransition, useContext } from 'react';
 import { getAuth, onAuthStateChanged, updatePhoneNumber, updateProfile } from 'firebase/auth';
-import { updateDoc, doc, collection, getDoc } from 'firebase/firestore';
+import { updateDoc, doc, collection, getDoc, getDocs } from 'firebase/firestore';
 import { app, db } from '../firebase/firebaseConfig';
 import { authContext } from './AuthComponent';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import ProfileUpload from './ProfileUpload';
 import Skeleton from 'react-loading-skeleton';
 import { FaUserCircle } from 'react-icons/fa';
+import Link from 'next/link';
 // import 'tailwindcss/tailwind.css';
 
 const UserAccount = () => {
@@ -50,6 +51,8 @@ const UserAccount = () => {
   // const [isPending, setIsPending] = useState(true);
   // const [isTransition, startTransition] = useTransition()
   // const authO = useContext(authContext)
+  const [pendingUsers, startTransitionUsers] = useTransition()
+  const [foundUsers, setFoundUsers] = useState(null)
 
   
     useEffect(()=>{
@@ -153,10 +156,44 @@ const UserAccount = () => {
       }, [ authO, dataFetched]);
       // ///////////////////////////////////////////
 
+
+      ///////
+
+      
+     
+  useEffect(() => {
+    const getUsers = () => {
+      startTransition(async () => {
+        try {
+          const auth = getAuth(app);
+          const authUser = auth.currentUser;
+          const authUserToken = await authUser?.getIdToken();
+
+          if (authUserToken) {
+            const usersRef = collection(db, 'users'); // Corrected to use collection
+
+            const usersRefsnapshot = await getDocs(usersRef);
+            const usersArray = [];
+            usersRefsnapshot.forEach((doc) => {
+              usersArray.push(doc.data());
+              // console.log(usersArray)
+            });
+            const otherusers = usersArray && usersArray.filter((user)=> {return user.displayName !== authUser.displayName})
+            setFoundUsers(otherusers);
+          }
+        } catch (err) {
+          console.error('Unable to fetch Users:', err.message);
+        }
+      });
+    };
+    getUsers();
+  }, [authO, formData]);
+
+
   const renderContent = ({user}) => {
     switch (selectedTab) {
       case 'profile':
-        return <div><Profile isProfileActive={selectedTab === 'profile'} pickupData={pickupData} setPickupData={setPickupData} user={user} dataFetched={dataFetched} setDataFetched={setDataFetched} startTransition={startTransition} formData={formData} setFormData={setFormData} isPending={isPending} authO={authO} /></div>;
+        return <div><Profile pendingUsers={pendingUsers} foundUsers={foundUsers} isProfileActive={selectedTab === 'profile'} pickupData={pickupData} setPickupData={setPickupData} user={user} dataFetched={dataFetched} setDataFetched={setDataFetched} startTransition={startTransition} formData={formData} setFormData={setFormData} isPending={isPending} authO={authO} /></div>;
       case 'pickups':
         return <Pickups user={user} formData={formData} />;
       case 'registerWares':
@@ -200,7 +237,7 @@ const UserAccount = () => {
   );
 };
 
-const Profile = ({user, isProfileActive, pickupData, formData, isPending, setFormData, setPickupData, authO,  startTransition, dataFetched, setDataFetched}) => {
+const Profile = ({user, pendingUsers, foundUsers,  isProfileActive, pickupData, formData, isPending, setFormData, setPickupData, authO,  startTransition, dataFetched, setDataFetched}) => {
   
   useEffect(() => {
     if (isProfileActive) { // Fetch only if Profile tab is active
@@ -269,7 +306,7 @@ const Profile = ({user, isProfileActive, pickupData, formData, isPending, setFor
           <div className="flex flex-col items-center">
             {formData.photoURL || formData.photo ? (
               <img
-                className="rounded-full shadow-xl overflow-hidden bg-center object-fill max-w-[50px] max-h-[50px]"
+                className="rounded-full shadow-xl overflow-hidden bg-center object-fill w-[50px] h-[50px]"
                 src={formData.photoURL || formData.photo}
                 width={50}
                 height={50}
@@ -281,6 +318,31 @@ const Profile = ({user, isProfileActive, pickupData, formData, isPending, setFor
             <h2 className="text-xl font-bold mt-4">{formData.name}</h2>
             <p className="text-gray-600">{formData.email}</p>
             <p className="text-gray-600">{formData.phone}</p>
+            {pendingUsers && isPending?
+                    <FaSpinner className="animate-spin mx-auto text-black"/> 
+                    : <div>
+                        {foundUsers && 
+                        <ul className='bg-gray-200 rounded-2xl w-full grid p-8 grid-cols-3 shadow-2xl border xsm:max-lg:grid-cols-2'>
+                          <h1 className='font-bold col-span-3 pb-4 xsm:max-lg:col-span-2 auto-cols-fr'>CONNECT AND CHAT</h1>
+                          {foundUsers.map((user)=>{
+                            return(
+                              <div className='bg-white flex items-center gap-4 border rounded-2xl shadow-md p-4 flex-col justify-between xsm:max-[670px]:col-span-2 xsm:max-lg:col-span-1'>
+                                <div className='overflow-hidden'>
+                                  <img className='rounded-full shadow-md border w-[50px] h-[50px]' 
+                                  src={user.photoURL} width={50} height={50} alt='User'/>
+                                </div>
+                                <li className='font-bold text-[17px] text-center'>{user.displayName}</li>
+                                <Link href={'/'}><FaEnvelopeOpenText/></Link>
+                                {/* <li className='font-[Poppins] text-[15px] p-4'>{user.email}</li> */}
+                              </div>
+                                
+                            )
+                          })
+                        }
+                        </ul>
+                      }
+                    </div>
+                }
             {/* Add more user details here */}
             {console.log(pickupData)}
             {
@@ -298,7 +360,7 @@ const Profile = ({user, isProfileActive, pickupData, formData, isPending, setFor
                     {/* <tr><td>{pickupData.user}</td></tr>  */}
                     
                     <tr className='border-r pb-2 pl-2'>
-                        <td className='flex flex-col '>{pickupData.pickuptime.map((k)=>{
+                        <td className='flex flex-col '>{(pickupData && pickupData.length>0) && pickupData.pickuptime.map((k)=>{
 
                             return <li className='w-full' key={k}>{convert24To12(k)}</li>
                         })}
@@ -306,7 +368,7 @@ const Profile = ({user, isProfileActive, pickupData, formData, isPending, setFor
                     </tr>
 
                     <tr className='border-r pb-2 pl-2'>
-                        <td className='flex flex-col '>{pickupData.pickupdate.map((d)=>{
+                        <td className='flex flex-col '>{(pickupData && pickupData.length>0) && pickupData.pickupdate.map((d)=>{
                             return <li className='w-full' key={d}>{d.toString()}</li>
                         })}
                         </td>
@@ -337,7 +399,7 @@ const Profile = ({user, isProfileActive, pickupData, formData, isPending, setFor
 
 const Pickups = ({user, formData}) => {
   return (
-    <div>
+    <div id='pickups'>
       <h2 className="text-2xl font-bold mb-4">Pickups</h2>
       <p>Pickups content goes here...</p>
       {/* TODO list for pickups */}
