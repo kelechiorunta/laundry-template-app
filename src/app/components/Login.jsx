@@ -1,7 +1,7 @@
 'use client'
-import { useState, useContext, useEffect } from 'react';
+import { useState, useContext, useEffect, startTransition } from 'react';
 import { app, auth } from '../firebase/firebaseConfig';
-import { signInWithEmailAndPassword, getAuth, signOut } from 'firebase/auth';
+import { signInWithEmailAndPassword, getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { getLoginCredentials, validateAuth } from '../server actions/server actions';
 import axios from 'axios';
@@ -23,25 +23,35 @@ const Login = () => {
   const [activeuser, setActiveUser] = useState(null)
   const [isPendingLogin, startTransitionLogin] = useTransition()
   const [isPendingLogout, startTransitionLogout] = useTransition()
+  const [isPending, startTransition] = useTransition()
   
   const router = useRouter()
 
   const authO = useContext(authContext)
 
-  const { authObject, setAuthObject } = authO
+  const { authObject, setAuthObject, isloggedOut } = authO
   const { status } = authObject
 
   const [V, setV] = useState(null)
 
   useEffect(()=>{
+    
     const revalidateAuth = async() => {
+      isloggedOut===true? setV( "User logged out") : setV("Session Expired")
+      startTransition(async() => {
         const user = await authUserEmail()
         const userV = await validateAuth()
+        
+        // const authC = getAuth()
+        // onAuthStateChanged(authC, (currentUser) => {
+        //   currentUser ? setV(status) : setV(status?status:"Session Expired soon")
+        // })
         setActiveUser(user)
-        setV(userV)
+        
+      })      
     }
     revalidateAuth()
-  },[])
+  },[status])
 
   const handleLogin = (e) =>{
     startTransitionLogin(async() => {
@@ -63,7 +73,7 @@ const Login = () => {
       console.log('User signed in');
       // console.log(token)
       console.log(await authUserEmail())
-      // console.log(await validateAuth())
+      console.log(await validateAuth())
       window.location.href = '/'
       
           // Create a new NextResponse object and set the cookie
@@ -119,6 +129,8 @@ const Login = () => {
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6">Log In</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
+        {console.log(V)}
+        {isPending? <h1>Loading...</h1> : <p>{V}</p>}
         {/* {status && <p className="text-blue-500 text-center">{status}</p>} */}
         <form onSubmit={handleLogin} 
         //action={getLoginCredentials}

@@ -15,10 +15,22 @@ export async function getUsers(){
 }
 
 export async function validateAuth(){
-    const authUser = getAuth(app)
+    const authUser = await getAuth(app)
     const user = authUser && authUser.currentUser
+    //var user //= authUser && authUser.currentUser
+    // onAuthStateChanged(authUser, async(currentUser) => {
+    //     if (currentUser){
+    //             user = await currentUser.getIdToken();}
+    //         else
+    //         {
+    //             console.log('User is not signed in ', user && user.uid, authUser
+
+    //             )
+    //         }
+    //     //return user
+    // })
     
-    return user? user.getIdToken() : user
+     return user? user : null //user.getIdToken() : user
 
 }
 

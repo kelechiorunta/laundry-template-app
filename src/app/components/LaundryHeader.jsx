@@ -22,12 +22,12 @@ export default function LaundryHeader() {
   const pathname = usePathname()
   const authO = useContext(authContext)
 
-  const { user } = authO
+  const { user, setAuthObject, userA, A, setLoggedOut } = authO
 
   const auth = getAuth(app)
 
   const [isauth, setAuth] = useState(null)
-  // const [user, setUser] = useState(null)
+  const [userm, setUser] = useState(user)
   const [isPending, startTransition] = useTransition()
   const [isPendingProfile, startTransitionProfile] = useTransition()
   const [isPendingAuth, startTransitionAuth] = useTransition()
@@ -51,29 +51,36 @@ export default function LaundryHeader() {
   //     setAuth(activeauth)
   //   //  }) 
   //   }
-  //   getActiveAuth()
-  // },[]) // i removed isauth from the dependency for performance issues
+  //   const timerId = setTimeout(getActiveAuth, 5000)
+
+  //   return() => {
+  //     clearTimeout(timerId)
+  //   }
+  // },[isauth, auth, userA]) // i removed isauth from the dependency for performance issues
 
   useEffect(() => {
       const authheader = getAuth(app)
+      setUser(user)
       // const authheaderC = authheader.currentUser
       onAuthStateChanged(authheader, (currentUser) => {
         setAuth(currentUser)
+       
       })
-  }, [isauth, auth])
+      console.log(userA, user)
+  }, [isauth, auth, userA])
 
-  // useEffect(()=>{
+  useEffect(()=>{
     
-  //   const getcurrentUser = () =>{
-  //     startTransitionProfile(async()=>{
-  //       onAuthStateChanged(auth, (currentUser) => {
-  //         setUser(currentUser); 
-  //       });
-  //     })
+    const getcurrentUser = () =>{
+      startTransitionProfile(async()=>{
+        onAuthStateChanged(auth, (currentUser) => {
+          setUser(currentUser); 
+        });
+      })
       
-  //   }
-  //   getcurrentUser()
-  // },[])
+    }
+    getcurrentUser()
+  },[auth])
 
   const clearCookies = () => {
     document.cookie.split(";").forEach((c) => {
@@ -89,13 +96,17 @@ export default function LaundryHeader() {
     setToggle(!toggle)
   }
 
-  const clearAuth = async() =>{
-    // startTransition(async()=>{
+  const clearAuth = () =>{
+     startTransition(async()=>{
       // setIsLoadingLogout(true)
     let timerId
     try{
       clearCookies()
       await signOut(auth); 
+      setAuthObject(prevState => ({ ...prevState, status: "User Logged Out"}));
+      setLoggedOut(true)
+      console.log(setAuthObject.status)
+      await closeSession()
       console.log("User signed out")
       // timerId = setTimeout(()=>{setIsLoadingLogout(false);},7000)
     }
@@ -103,7 +114,7 @@ export default function LaundryHeader() {
       console.log(err)
     }
     
-    // })
+     })
     
   }
 
@@ -186,10 +197,10 @@ export default function LaundryHeader() {
                       <div className="flex gap-5 max-md:flex-col max-md:gap-0">
 
                         
-                        {(isauth && auth)? 
+                        {(userA)? 
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
-                            <a
-                            onClick={async()=>{ clearAuth(); await closeSession(); window.location.href='/login'; console.log(user, isauth, auth)}}
+                            <Link
+                            onClick={clearAuth}
                             href={'/login'}
                             disabled={isPending}
                               className="box-border relative shrink-0 px-6 py-4 mt-5 w-[100px] text-center rounded border border-[#1665F8] appearance-none cursor-pointer text-[white] bg-[#1665F8] hover:text-[#1665F8] transition-all hover:bg-white "
@@ -197,20 +208,20 @@ export default function LaundryHeader() {
                             >
                               {isPending ? <FaSpinner className="animate-spin mx-auto w-[20px] h-[20px]"/> : 'Logout'}
                               
-                            </a>
+                            </Link>
                           </div> :
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
-                            <a
+                            <Link
                             href={'/login'}
                               className="box-border relative shrink-0 px-6 py-4 mt-5 text-center rounded border border-[#1665F8] appearance-none cursor-pointer text-[white] bg-[#1665F8] hover:text-[#1665F8] transition-all hover:bg-white "
                               // openLinkInNewTab={false}
                             >
                               Login
-                            </a>  
+                            </Link>  
                         </div>}
                           
                         <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
-                            {!(isauth)? <FaUserTag className="mt-6 rounded-full border shadow-lg" size={50}/>:
+                            {!(userA)? <FaUserTag className="mt-6 rounded-full border shadow-lg" size={50}/>:
                             
                             <button
                             onClick={handleToggle}
@@ -222,7 +233,7 @@ export default function LaundryHeader() {
                               onMouseOut={()=>setActive(false)}
                               
                             >
-                              {console.log(user &&  user)}
+                              {console.log(userA && userA)}
                               {isPendingProfile? <FaSpinner className="animate-spin mx-auto fill-white w-[100%] h-[50px]"/>: //: `${user === null? "" : user && (user?.email) && (user?.email)[0].toUpperCase()}`}
                               <div className={` flex items-center justify-center text-center border top-0 border-white rounded-2xl black bg-[#082f49] text-white`}>
                                   {!toggle ? <img src={user && user.photoURL} className="absolute w-[50px] h-[50px] overflow-hidden rounded-full" width={50} height={50} alt="pic"/>
