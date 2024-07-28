@@ -182,7 +182,7 @@ export default function LaundryHeader() {
                   <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
                     <div className="box-border flex relative flex-col shrink-0 mt-5">
                       <div className="flex gap-5 max-md:flex-col max-md:gap-0">
-                        <div className="flex flex-col w-[110px] max-md:ml-0 max-md:w-full">
+                        <div className="flex flex-col w-[120px] max-md:ml-0 max-md:w-full">
                           <Link
                             href={'/signup'}
                             className="box-border relative shrink-0 px-6 py-4 mt-5 text-center border border-[#1665F8] rounded appearance-none cursor-pointer bg-[white] text-[#1665F8] hover:bg-[#1665F8] transition-all hover:text-white "

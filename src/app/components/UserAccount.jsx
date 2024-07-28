@@ -288,6 +288,7 @@ const Profile = ({user, pendingUsers, foundUsers,  isProfileActive, pickupData, 
     return date.toLocaleString('en-US', options);
   }
   
+   
   return (
     <div className="p-4 w-full max-w-2xl mx-auto">
       {isPending ? (
@@ -332,7 +333,7 @@ const Profile = ({user, pendingUsers, foundUsers,  isProfileActive, pickupData, 
                                   src={user.photoURL} width={50} height={50} alt='User'/>
                                 </div>
                                 <li className='font-bold text-[17px] text-center'>{user.displayName}</li>
-                                <Link href={'/'}><FaEnvelopeOpenText/></Link>
+                                <Link href={`/chat/${encodeURIComponent(user.email)}`} className='flex items-center gap-x-2'><FaEnvelopeOpenText/> Chat</Link>
                                 {/* <li className='font-[Poppins] text-[15px] p-4'>{user.email}</li> */}
                               </div>
                                 

@@ -1,0 +1,287 @@
+// // components/ChatBox.js
+// 'use client'
+// import React, { useState, useEffect, startTransition, useTransition } from 'react';
+// import { app, db } from '../firebase/firebaseConfig';
+// import Skeleton from 'react-loading-skeleton';
+// import {
+//     getDocs,
+//   collection,
+//   addDoc,
+//   onSnapshot,
+//   query,
+//   orderBy,
+//   serverTimestamp,
+// } from 'firebase/firestore';
+// import { FaPaperPlane, FaUserCircle } from 'react-icons/fa';
+// import { getAuth } from 'firebase/auth';
+
+
+// const ChatBox = ({email}) => {
+//   const [messages, setMessages] = useState([]);
+//   const [input, setInput] = useState('');
+//   const [allusers, setAllUsers] = useState([])
+//   const [isPending, startTransition] = useTransition()
+//   const [idRecipient, setIdRecipient] = useState('')
+//   const [idSender, setIdSender] = useState('')
+//   const auth = getAuth(app)
+  
+//   useEffect(() => {
+//     const authenticateChats = async() =>{
+//         startTransition(async() => {
+//             try{
+//                 const sender_id = auth.currentUser && auth.currentUser.uid
+//                 setIdSender(sender_id)
+//                 console.log(sender_id)
+                
+//                 const allusersRef = collection(db, 'users')
+//                 const allusersSnapshot = await getDocs(allusersRef)
+//             if (allusersSnapshot){
+//                 const users = []
+//                 allusersSnapshot.forEach(user => {
+//                     users.push(user.data())
+//                     setAllUsers(users)
+//                 })
+//                 // console.log(email)
+//                     const findUser = users && users.filter(user=>{return user.email == decodeURIComponent(email)})
+//                     const userId = findUser && findUser[0].userId
+//                     console.log(userId)
+//                     setIdRecipient(userId)
+//                 ;
+//                 }
+                
+//             }
+//             catch(err){
+//                 console.error(err.message, "No User found")
+//             }
+//         })
+        
+//     }
+//     authenticateChats()
+//     const recipient = query(collection(db, 'messages', idSender), orderBy('timestamp', 'asc'));
+//     const unsubscribe = onSnapshot(recipient, (snapshot) => {
+//       setMessages(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+//     });
+//     return () => unsubscribe();
+//   }, [auth]);
+
+//   const sendMessage = async (e) => {
+//     e.preventDefault();
+//     if (input.trim()) {
+//       await addDoc(collection(db, 'messages', idRecipient), {
+//         text: input,
+//         timestamp: serverTimestamp(),
+//       });
+//       await addDoc(collection(db, 'messages', idSender), {
+//         text: input,
+//         timestamp: serverTimestamp(),
+//       });
+//       setInput('');
+//     }
+//   };
+
+//   return (
+//     <div className="flex flex-col h-screen p-4 bg-gray-100">
+//       <div className="flex flex-col flex-grow p-4 bg-white shadow-lg rounded-lg overflow-hidden">
+//       {isPending ? (
+//         <div className="animate-pulse">
+//           <div className="flex items-center space-x-4 mb-4">
+//             <Skeleton circle={true} height={50} width={50} />
+//             <div>
+//               <Skeleton width={120} />
+//               <Skeleton width={180} />
+//             </div>
+//           </div>
+//           <Skeleton count={3} />
+//         </div>
+//       ) : (
+//         <div className="flex flex-col flex-grow overflow-y-auto mb-4">
+//           {messages.map(({ id, text }) => (
+//             <div key={id} className="flex items-center mb-2">
+//               <FaUserCircle className="text-gray-600" size={24} />
+//               <p className="ml-2 p-2 bg-gray-200 rounded-lg">{text}</p>
+//             </div>
+//           ))}
+//         </div>)}
+//         <form onSubmit={sendMessage} className="flex items-center">
+//           <input
+//             type="text"
+//             value={input}
+//             onChange={(e) => setInput(e.target.value)}
+//             className="flex-grow p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+//             placeholder="Type your message..."
+//           />
+//           <button
+//             type="submit"
+//             className="ml-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+//           >
+//             <FaPaperPlane />
+//           </button>
+//         </form>
+//       </div>
+//     </div>
+//   );
+// };
+
+// export default ChatBox;
+'use client'
+import { useEffect, useState, useTransition } from 'react';
+import { getAuth, onAuthStateChanged } from 'firebase/auth';
+import { collection, getDocs, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, setDoc } from 'firebase/firestore';
+// import { db } from './firebase'; // Adjust the path to your Firebase configuration
+import { db } from '../firebase/firebaseConfig';
+import { FaPaperPlane } from 'react-icons/fa';
+import Skeleton from 'react-loading-skeleton';
+
+const ChatBox = ({ email }) => {
+  const [authUser, setAuthUser] = useState(null);
+  const [recipientUser, setRecipientUser] = useState(null);
+  const [messages, setMessages] = useState([]);
+  const [input, setInput] = useState('');
+  const [chatId, setChatId] = useState(null);
+  const [isPending, startTransition] = useTransition()
+  
+
+  useEffect(() => {
+    const getChats = () => {
+        startTransition(async()=>{
+            try{
+                const auth = getAuth();
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            setAuthUser(user);
+            
+            const allUsersSnapshot = await getDocs(collection(db, 'users'));
+            const users = allUsersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            const recipient = users.find(u => u.email === decodeURIComponent(email));
+            if (recipient) {
+              setRecipientUser(recipient);
+    
+              const chatDocId = [user.uid, recipient.id].sort().join('_');
+              setChatId(chatDocId);
+    
+              const messagesQuery = query(
+                collection(db, 'chats', chatDocId, 'messages'),
+                orderBy('timestamp', 'asc')
+              );
+    
+              const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
+                setMessages(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+              });
+    
+              return () => unsubscribe();
+            }
+          }
+        });
+            }
+            catch(err){
+                console.error('Could not fetch Chats')
+            }
+        })
+    
+    }
+
+    getChats()
+    
+  }, [email]);
+
+  const sendMessage = async (e) => {
+    e.preventDefault();
+    if (input.trim() && chatId) {
+      await addDoc(collection(db, 'chats', chatId, 'messages'), {
+        text: input,
+        senderId: authUser.uid,
+        timestamp: serverTimestamp(),
+      });
+      setInput('');
+    }
+  };
+
+  return (
+        <div className="flex flex-col h-screen p-4 bg-gray-100">
+          <div className="flex flex-col flex-grow p-4 bg-white shadow-lg rounded-lg overflow-hidden">
+          {isPending ? (
+            <div className="animate-pulse">
+              <div className="flex items-center space-x-4 mb-4">
+                <Skeleton circle={true} height={50} width={50} />
+                <div>
+                  <Skeleton width={120} />
+                  <Skeleton width={180} />
+                </div>
+              </div>
+              <Skeleton count={3} />
+            </div>
+          ) : (
+            <div className="flex flex-col h-full overflow-y-auto mb-4">
+           {messages.map((msg) => (
+            <div
+              key={msg.id}
+              className={`flex ${msg.senderId === authUser.uid ? 'justify-end' : 'justify-start'} mb-2`}
+            >
+              <div className="p-2 rounded-lg shadow-lg">
+                <p className={`${msg.senderId === authUser.uid ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'} p-2 rounded-lg`}>{msg.text}</p>
+              </div>
+            </div>
+          ))}
+         </div>)
+}
+            {/* // <div className="flex flex-col flex-grow overflow-y-auto mb-4">
+            //   {messages.map(({ id, text }) => (
+            //     <div key={id} className="flex items-center mb-2">
+            //       <FaUserCircle className="text-gray-600" size={24} />
+            //       <p className="ml-2 p-2 bg-gray-200 rounded-lg">{text}</p>
+            //     </div>
+            //   ))}
+            // </div>)} */}
+            
+            <form onSubmit={sendMessage} className="flex items-center">
+              <input
+                type="text"
+                value={input}
+                onChange={(e) => setInput(e.target.value)}
+                className="flex-grow p-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-600"
+                placeholder="Type your message..."
+              />
+              <button
+                type="submit"
+                className="ml-2 p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-600"
+              >
+                <FaPaperPlane />
+              </button>
+            </form>
+          </div>
+        </div>
+      );
+
+//   return (
+//     <div className="flex flex-col h-screen p-4 bg-gray-100">
+//       <div className="flex-grow p-4 bg-white shadow-lg rounded-lg overflow-hidden">
+//         <div className="flex flex-col h-full overflow-y-auto mb-4">
+//           {messages.map((msg) => (
+//             <div
+//               key={msg.id}
+//               className={`flex ${msg.senderId === authUser.uid ? 'justify-end' : 'justify-start'} mb-2`}
+//             >
+//               <div className="p-2 rounded-lg shadow-lg">
+//                 <p className={`${msg.senderId === authUser.uid ? 'bg-blue-500 text-white' : 'bg-gray-300 text-black'} p-2 rounded-lg`}>{msg.text}</p>
+//               </div>
+//             </div>
+//           ))}
+//         </div>
+//         <form onSubmit={sendMessage} className="flex">
+//           <input
+//             type="text"
+//             value={input}
+//             onChange={(e) => setInput(e.target.value)}
+//             placeholder="Type your message..."
+//             className="flex-grow p-2 border rounded-l-lg"
+//           />
+//           <button type="submit" className="p-2 bg-blue-500 text-white rounded-r-lg">Send</button>
+//         </form>
+//       </div>
+//     </div>
+//   );
+  
+};
+
+export default ChatBox;
