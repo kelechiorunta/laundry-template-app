@@ -185,7 +185,7 @@ export default function LaundryHeader() {
                         <div className="flex flex-col w-[120px] max-md:ml-0 max-md:w-full">
                           <Link
                             href={'/signup'}
-                            className="box-border relative shrink-0 px-6 py-4 mt-5 text-center border border-[#1665F8] rounded appearance-none cursor-pointer bg-[white] text-[#1665F8] hover:bg-[#1665F8] transition-all hover:text-white "
+                            className="box-border relative shrink-0 px-6 py-2 mt-7 text-center border border-[#1665F8] rounded appearance-none cursor-pointer bg-[white] text-[#1665F8] hover:bg-[#1665F8] transition-all hover:text-white "
                            
                             disabled={isLoadingSignUp}
                           >
@@ -206,7 +206,7 @@ export default function LaundryHeader() {
                             onClick={clearAuth}
                             href={'/login'}
                             disabled={isPending}
-                              className="box-border relative shrink-0 px-6 py-4 mt-5 w-[100px] text-center rounded border border-[#1665F8] appearance-none cursor-pointer text-[white] bg-[#1665F8] hover:text-[#1665F8] transition-all hover:bg-white "
+                              className="box-border relative shrink-0 px-6 py-2 mt-7 w-[100px] text-center rounded border border-[#1665F8] appearance-none cursor-pointer text-[white] bg-[#1665F8] hover:text-[#1665F8] transition-all hover:bg-white "
                               // openLinkInNewTab={false}
                             >
                               {isPending ? <FaSpinner className="animate-spin mx-auto w-[20px] h-[20px]"/> : 'Logout'}
@@ -216,7 +216,7 @@ export default function LaundryHeader() {
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
                             <Link
                             href={'/login'}
-                              className="box-border relative shrink-0 px-6 py-4 mt-5 text-center rounded border border-[#1665F8] appearance-none cursor-pointer text-[white] bg-[#1665F8] hover:text-[#1665F8] transition-all hover:bg-white "
+                              className="box-border relative shrink-0 px-6 py-2 mt-7 text-center rounded border border-[#1665F8] appearance-none cursor-pointer text-[white] bg-[#1665F8] hover:text-[#1665F8] transition-all hover:bg-white "
                               // openLinkInNewTab={false}
                             >
                               Login

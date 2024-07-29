@@ -126,7 +126,7 @@
 'use client'
 import { useEffect, useState, useTransition } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { collection, getDocs, query, orderBy, onSnapshot, addDoc, serverTimestamp, doc, setDoc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc, doc, setDoc, updateDoc } from 'firebase/firestore';
 // import { db } from './firebase'; // Adjust the path to your Firebase configuration
 import { db } from '../firebase/firebaseConfig';
 import { FaPaperPlane } from 'react-icons/fa';
@@ -188,6 +188,18 @@ const ChatBox = ({ email }) => {
   const sendMessage = async (e) => {
     e.preventDefault();
     if (input.trim() && chatId) {
+        const userRef = doc(db, 'allchats', chatId)
+        const usersnapshot = await getDoc(userRef)
+        if (usersnapshot){
+            await setDoc(doc(db, 'allchats', chatId), {
+                id:chatId,
+              });
+        }else{
+            await addDoc(doc(db, 'allchats', chatId), {
+                id:chatId,
+              });
+        }
+        
       await addDoc(collection(db, 'chats', chatId, 'messages'), {
         text: input,
         senderId: authUser.uid,

@@ -33,6 +33,7 @@ const UserAccount = () => {
   const [isPendingProfileUpdate, startTransitionProfileUpdate] = useTransition()
   const [isPendingUploadPic, startTransitionUploadPic] = useTransition()
   const [active, setActive] = useState(user && (user?.email).toString())
+  const [isPendingLikes, startTransitionLikes] = useTransition()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -52,8 +53,11 @@ const UserAccount = () => {
   // const [isTransition, startTransition] = useTransition()
   // const authO = useContext(authContext)
   const [pendingUsers, startTransitionUsers] = useTransition()
-  const [foundUsers, setFoundUsers] = useState(null)
-
+  const [foundUsers, setFoundUsers] = useState([])
+  const [chats, setChats] = useState([])
+  const [mergedIds, setMergedIds] = useState([])
+  const [connects, setConnects] = useState([])
+  const [toggle, setToggle] = useState(null)
   
     useEffect(()=>{
         
@@ -116,6 +120,7 @@ const UserAccount = () => {
         getUsers();
       }, [authO]);
 
+      
       ////////////////////////////// FOR GETTING THE PICKUPS
       useEffect(() => {
         const fetchUserData = async () => {
@@ -157,49 +162,86 @@ const UserAccount = () => {
       // ///////////////////////////////////////////
 
 
+      function getUsersById(users, text) {
+        return users.filter(user => {return text.includes(user.userId)});
+      }
+
       ///////
-
-      
      
-  useEffect(() => {
-    const getUsers = () => {
-      startTransition(async () => {
-        try {
-          const auth = getAuth(app);
-          const authUser = auth.currentUser;
-          const authUserToken = await authUser?.getIdToken();
+      useEffect(() => {
+        const getUsersAndChats = () => {
+          startTransition(async () => {
+            try {
+              const auth = getAuth(app);
+              const authUser = auth.currentUser;
+              const authUserToken = await authUser?.getIdToken();
+    
+              if (authUserToken) {
+                const usersRef = collection(db, 'users');
+                const chatsRef = collection(db, 'allchats');
+                const chatsSnapshot = await getDocs(chatsRef);
+                
+                const [usersRefsnapshot, chatsRefsnapshot] = await Promise.all([
+                  getDocs(usersRef),
+                  getDocs(chatsRef)
+                ]);
+    
+                const usersArray = [];
+                const chatsArray = [];
+                var sliceditems = []
+                
+    
+                usersRefsnapshot.forEach((doc) => {
+                  usersArray.push(doc.data());
+                });
+    
+                const chatIdsArray = chatsSnapshot.docs.map(doc => {return  doc.id});
+                const filteredArray = chatIdsArray.filter(id=>{return id.includes(authUser.uid)})
+              
+                console.log(filteredArray)
+                console.log(chatIdsArray)
+                console.log(filteredArray && filteredArray.length)
 
-          if (authUserToken) {
-            const usersRef = collection(db, 'users'); // Corrected to use collection
+                setChats(filteredArray && filteredArray.length)
+    
+                console.log('Users:', usersArray);
+                console.log('Chats:', chatsArray);
+    
+                const otherUsers = usersArray.filter(user => user.displayName !== authUser.displayName);
+                setFoundUsers(otherUsers);
 
-            const usersRefsnapshot = await getDocs(usersRef);
-            const usersArray = [];
-            usersRefsnapshot.forEach((doc) => {
-              usersArray.push(doc.data());
-              // console.log(usersArray)
-            });
-            const otherusers = usersArray && usersArray.filter((user)=> {return user.displayName !== authUser.displayName})
-            setFoundUsers(otherusers);
-          }
-        } catch (err) {
-          console.error('Unable to fetch Users:', err.message);
-        }
-      });
-    };
-    getUsers();
-  }, [authO, formData]);
+                const newarray = [];
+                filteredArray && filteredArray.forEach(i => {
+               
+                    newarray.push(getUsersById(otherUsers, i)[0])
+                    console.log(newarray)
+                    setConnects(newarray)
+                   })
+                
+              }
+            } catch (err) {
+              console.error('Unable to fetch Users or Chats:', err.message);
+            }
+          });
+        };
+    
+        getUsersAndChats();
+      }, [authO, formData]);
+
+  //////
 
 
-  const renderContent = ({user}) => {
+
+  const renderContent = ({allMessages, user, chats, mergedIds, isPendingLikes}) => {
     switch (selectedTab) {
       case 'profile':
-        return <div><Profile pendingUsers={pendingUsers} foundUsers={foundUsers} isProfileActive={selectedTab === 'profile'} pickupData={pickupData} setPickupData={setPickupData} user={user} dataFetched={dataFetched} setDataFetched={setDataFetched} startTransition={startTransition} formData={formData} setFormData={setFormData} isPending={isPending} authO={authO} /></div>;
+        return <div><Profile setToggle={setToggle} toggle={toggle} connects={connects} allMessages={allMessages} isPendingLikes={isPendingLikes} mergedIds={mergedIds} chats={chats} pendingUsers={pendingUsers} foundUsers={foundUsers} isProfileActive={selectedTab === 'profile'} pickupData={pickupData} setPickupData={setPickupData} user={user} dataFetched={dataFetched} setDataFetched={setDataFetched} startTransition={startTransition} formData={formData} setFormData={setFormData} isPending={isPending} authO={authO} /></div>;
       case 'pickups':
         return <Pickups user={user} formData={formData} />;
       case 'registerWares':
         return <RegisterWares formData={formData} setFormData={setFormData} isPending={isPending}/>;
       default:
-        return <Profile user={user}/>;
+        return <Profile chats={chats} user={user}/>;
     }
   };
 
@@ -208,6 +250,7 @@ const UserAccount = () => {
       <aside className="w-64 bg-gray-800 text-white flex-shrink-0 max-[900px]:w-full">
         <div className="p-4 flex flex-col items-center gap-4">
           {console.log(formData)}
+          
         {formData.photo ? <img src={formData.photo} width={50} height={50} alt="Uploaded" className="rounded-full mt-4 w-[50px] h-[50px]" />:<FaUser size={40} />}
           {isPending? 
                     <FaSpinner className="animate-spin mx-auto text-white"/> 
@@ -231,13 +274,13 @@ const UserAccount = () => {
         </nav>
       </aside>
       <main className="flex-1 p-8 bg-gray-100">
-        {renderContent({user})}
+        {renderContent({user, chats, mergedIds, isPendingLikes, connects, toggle, setToggle})}
       </main>
     </div>
   );
 };
 
-const Profile = ({user, pendingUsers, foundUsers,  isProfileActive, pickupData, formData, isPending, setFormData, setPickupData, authO,  startTransition, dataFetched, setDataFetched}) => {
+const Profile = ({toggle, connects, setToggle, mergedIds, chats, user, isPendingLikes, pendingUsers, foundUsers,  isProfileActive, pickupData, formData, isPending, setFormData, setPickupData, authO,  startTransition, dataFetched, setDataFetched}) => {
   
   useEffect(() => {
     if (isProfileActive) { // Fetch only if Profile tab is active
@@ -252,11 +295,6 @@ const Profile = ({user, pendingUsers, foundUsers,  isProfileActive, pickupData, 
             const pickupRef = doc(db, 'pickups', userPid);
             const pickupRefsnapshot = await getDoc(pickupRef);
             const userRefsnapshot = await getDoc(userRef);
-  
-            // if (userRefsnapshot.exists()) {
-            //   const data = userRefsnapshot.data();
-            //   setFormData(data);
-            // }
   
             if (pickupRefsnapshot.exists()) {
                 const pickupdata = pickupRefsnapshot.data();
@@ -319,6 +357,15 @@ const Profile = ({user, pendingUsers, foundUsers,  isProfileActive, pickupData, 
             <h2 className="text-xl font-bold mt-4">{formData.name}</h2>
             <p className="text-gray-600">{formData.email}</p>
             <p className="text-gray-600">{formData.phone}</p>
+            {console.log(connects)}
+            {isPendingLikes? <p>Loading</p>:<p className='uppercase font-bold'>{`${formData.name} has ${chats && chats} connect${chats<2?'':'s'}`}</p>}
+            <div className='relative '>
+            {<span className='relative cursor-pointer' onMouseEnter={()=>setToggle(true)} onMouseOut={()=>setToggle(false)}>CHECK FRIENDS</span>}
+            {toggle && 
+              <div className='shadow-md rounded-md absolute z-10 flex flex-col items-start bg-black text-white pl-4 pr-4 w-[200px]' >
+                {connects && connects.map(item => {return <li className='cursor-pointer' key={item.userId}>{item.username.toUpperCase()}</li>})}
+              </div>}
+            </div>
             {pendingUsers && isPending?
                     <FaSpinner className="animate-spin mx-auto text-black"/> 
                     : <div>
@@ -332,9 +379,11 @@ const Profile = ({user, pendingUsers, foundUsers,  isProfileActive, pickupData, 
                                   <img className='rounded-full shadow-md border w-[50px] h-[50px]' 
                                   src={user.photoURL} width={50} height={50} alt='User'/>
                                 </div>
+                                {/* {console.log(chats && chats.length>0? chats:"Nothing")} */}
                                 <li className='font-bold text-[17px] text-center'>{user.displayName}</li>
                                 <Link href={`/chat/${encodeURIComponent(user.email)}`} className='flex items-center gap-x-2'><FaEnvelopeOpenText/> Chat</Link>
                                 {/* <li className='font-[Poppins] text-[15px] p-4'>{user.email}</li> */}
+                                
                               </div>
                                 
                             )
@@ -345,6 +394,7 @@ const Profile = ({user, pendingUsers, foundUsers,  isProfileActive, pickupData, 
                     </div>
                 }
             {/* Add more user details here */}
+            
             {console.log(pickupData)}
             {
             pickupData &&
