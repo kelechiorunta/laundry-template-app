@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { FaUser, FaTruck, FaTshirt, FaSpinner, FaConnectdevelop, FaEnvelopeOpenText } from 'react-icons/fa';
+import { FaUser, FaTruck, FaTshirt, FaSpinner, FaRegistered, FaUserEdit, FaConnectdevelop, FaEnvelopeOpenText } from 'react-icons/fa';
 import { useEffect, useTransition, useContext } from 'react';
 import { getAuth, onAuthStateChanged, updatePhoneNumber, updateProfile } from 'firebase/auth';
 import { updateDoc, doc, collection, getDoc, getDocs } from 'firebase/firestore';
@@ -11,10 +11,21 @@ import ProfileUpload from './ProfileUpload';
 import Skeleton from 'react-loading-skeleton';
 import { FaUserCircle } from 'react-icons/fa';
 import Link from 'next/link';
+import Dashboard from './DashBoard';
+import { FaPants, FaHat, FaPlus, FaMinus } from 'react-icons/fa';
+// import LaundryPickupForm from './LaundryPickupForm';
+import LaundryPickupForm from './LaundryPickupForm';
 // import 'tailwindcss/tailwind.css';
 
 const UserAccount = () => {
   const [selectedTab, setSelectedTab] = useState('profile');
+
+  const wares = [
+    { id: 'shirt', name: 'Shirt', price: 5, icon: <FaTshirt /> },
+    { id: 'pants', name: 'Pants', price: 7, icon: <FaPants /> },
+    { id: 'hat', name: 'Hat', price: 3, icon: <FaHat /> },
+  ];
+
 
   const [isPending, startTransition] = useTransition()
 
@@ -238,6 +249,11 @@ const UserAccount = () => {
         return <div><Profile setToggle={setToggle} toggle={toggle} connects={connects} allMessages={allMessages} isPendingLikes={isPendingLikes} mergedIds={mergedIds} chats={chats} pendingUsers={pendingUsers} foundUsers={foundUsers} isProfileActive={selectedTab === 'profile'} pickupData={pickupData} setPickupData={setPickupData} user={user} dataFetched={dataFetched} setDataFetched={setDataFetched} startTransition={startTransition} formData={formData} setFormData={setFormData} isPending={isPending} authO={authO} /></div>;
       case 'pickups':
         return <Pickups user={user} formData={formData} />;
+      case 'update':
+        return <Dashboard user={user} formData={formData}/>;//<Pickups user={user} formData={formData} />;
+      case 'wares':
+        return <LaundryPickupForm wares={wares}/>
+        // return <LaundryPickupForm/>;
       case 'registerWares':
         return <RegisterWares formData={formData} setFormData={setFormData} isPending={isPending}/>;
       default:
@@ -264,11 +280,17 @@ const UserAccount = () => {
             <li onClick={() => setSelectedTab('profile')} className="p-4 hover:bg-gray-700 cursor-pointer">
               <FaUser className="inline-block mr-2" /> Profile
             </li>
+            <li onClick={() => setSelectedTab('update')} className="p-4 hover:bg-gray-700 cursor-pointer">
+              <FaUserEdit className="inline-block mr-2" /> Update Profile
+            </li>
+            <li onClick={() => setSelectedTab('wares')} className="p-4 hover:bg-gray-700 cursor-pointer">
+              <FaRegistered className="inline-block mr-2" /> Register
+            </li>
             <li onClick={() => setSelectedTab('pickups')} className="p-4 hover:bg-gray-700 cursor-pointer">
               <FaTruck className="inline-block mr-2" /> Pickups
             </li>
             <li onClick={() => setSelectedTab('registerWares')} className="p-4 hover:bg-gray-700 cursor-pointer">
-              <FaTshirt className="inline-block mr-2" /> Register Wares
+              <FaTshirt className="inline-block mr-2" /> Book an Appointment
             </li>
           </ul>
         </nav>
@@ -363,7 +385,7 @@ const Profile = ({toggle, connects, setToggle, mergedIds, chats, user, isPending
             {<span className='relative cursor-pointer' onMouseEnter={()=>setToggle(true)} onMouseOut={()=>setToggle(false)}>CHECK FRIENDS</span>}
             {toggle && 
               <div className='shadow-md rounded-md absolute z-10 flex flex-col items-start bg-black text-white pl-4 pr-4 w-[200px]' >
-                {connects && connects.map(item => {return <li className='cursor-pointer' key={item.userId}>{item.username.toUpperCase()}</li>})}
+                {connects && connects.map(item => {return <li className='cursor-pointer' key={item.userId}>{item.displayName.toUpperCase()}</li>})}
               </div>}
             </div>
             {pendingUsers && isPending?

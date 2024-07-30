@@ -229,7 +229,7 @@ const ChatBox = ({ email }) => {
            {messages.map((msg) => (
             <div
               key={msg.id}
-              className={`flex ${msg.senderId === authUser.uid ? 'justify-end' : 'justify-start'} mb-2`}
+              className={`flex ${msg.senderId === authUser.uid ? 'justify-end' : 'justify-start'} mb-2  border-y-gray-400 border-x-0 py-4`}
             >
               <div className="p-2 rounded-lg shadow-lg">
               {msg.senderId === authUser.uid ? <div><img src={authUser.photoURL} width={50} height={50} className='w-[50px] h-[50px] rounded-full' alt='S'/> {authUser.displayName}</div>

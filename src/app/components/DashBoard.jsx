@@ -266,7 +266,8 @@ export default function Dashboard() {
 
         {/* Main Content Section */}
         <div className="bg-[rgba(0,0,255,0.2)] bg-contain bg-[url('../../public/imgs/bg_memphis.png')] md:w-2/3 p-4">
-          <h2 className="text-2xl font-semibold mb-4">Schedule a Pickup</h2>
+          {/* <h2 className="text-2xl font-semibold mb-4">Schedule a Pickup</h2> */}
+          <h2 className="text-2xl font-semibold mb-4">Update Profile</h2>
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="flex flex-col">
               <label className="font-bold mb-1 text-gray-700">Name</label>
@@ -362,12 +363,12 @@ export default function Dashboard() {
               {/* {console.log(photoURL)} */}
               {formData.photo && <img src={formData.photo} alt="Profile" />}
             <div className='w-full flex items-center justify-center gap-x-4'>
-              <button
+              {/* <button
                 type="submit"
                 className="w-full bg-blue-500 text-white py-2 rounded-md hover:bg-blue-600 transition-colors"
               >
                 Schedule Pickup
-              </button>
+              </button> */}
               <button
               onClick={()=>handleProfileUpdate(formData)}
               type="button"

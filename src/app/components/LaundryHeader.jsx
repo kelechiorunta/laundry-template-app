@@ -6,7 +6,7 @@ import Link from "next/link";
 import * as React from "react";
 import { authUserEmail } from "../server actions/server actions";
 import { closeSession } from "../server actions/server actions";
-import { FaUserTag} from "react-icons/fa";
+import { FaUserTag, FaTimes} from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
 // import { auth } from "../firebase/firebaseConfig";
@@ -36,6 +36,9 @@ export default function LaundryHeader() {
   const [isLoadingLogout, setIsLoadingLogout] = useState(false)
   const [isLoadingSignUp, setIsLoadingSignUp] = useState(false)
   const [active, setActive] = useState(false)
+  const [toggle, setToggle] = useState(false)
+  const [toggleMenu, setMenuToggle] = useState(false)
+
 
 
   // startTransitionProfile(async()=>{
@@ -68,7 +71,7 @@ export default function LaundryHeader() {
         setAuth(currentUser)
        
       })
-      console.log(userA, user)
+      // console.log(userA, user)
   }, [isauth, auth, userA])
 
   useEffect(()=>{
@@ -92,10 +95,13 @@ export default function LaundryHeader() {
     });
   };
 
-  const [toggle, setToggle] = useState(false)
-
+  
   const handleToggle = () =>{
     setToggle(!toggle)
+  }
+
+  const handleMenuToggle = () =>{
+    setMenuToggle(!toggleMenu)
   }
 
   const clearAuth = () =>{
@@ -236,7 +242,7 @@ export default function LaundryHeader() {
                               onMouseOut={()=>setActive(false)}
                               
                             >
-                              {console.log(userA && userA)}
+                              {/* {console.log(userA && userA)} */}
                               {isPendingProfile? <FaSpinner className="animate-spin mx-auto fill-white w-[100%] h-[50px]"/>: //: `${user === null? "" : user && (user?.email) && (user?.email)[0].toUpperCase()}`}
                               <div className={` flex items-center justify-center text-center border top-0 border-white rounded-2xl black bg-[#082f49] text-white`}>
                                   {!toggle ? <img src={user && user.photoURL} className="absolute w-[50px] h-[50px] overflow-hidden rounded-full" width={50} height={50} alt="pic"/>
@@ -260,14 +266,33 @@ export default function LaundryHeader() {
               </div>
             </div>
             <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full ">
-              <div className="box-border flex relative flex-col shrink-0 px-2.5 -mt-9 mr-auto mb-auto ml-28 w-full max-w-[273px]">
+              <div className="box-border flex relative flex-col shrink-0 px-2.5 -mt-9 mr-auto mb-auto ml-28 w-full max-w-[273px] xsm:max-sm:-mt-8">
                 <div className="flex gap-5 max-md:flex-col max-md:gap-0" />
               </div>
-              <img
-                loading="lazy"
-                src="https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Fc55a5ccdcf7e4373a29a84e42a4eb224"
-                className="box-border object-cover overflow-hidden shrink-0 mb-auto ml-auto w-full aspect-[0.99] max-w-[32px] min-h-[20px] min-w-[20px] hidden max-lg:flex md:max-2xl:mt-8 max-md:mb-auto max-sm:flex xsm:max-md:-mt-8"
-              />
+              <div className="relative h-full w-full rounded-md shadow-md flex items-center justify-end xsm:max-sm:-mt-8 lg:max-2xl:hidden">
+                <div className="">
+                <img
+                  onClick={handleMenuToggle}
+                  loading="lazy"
+                  src="https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Fc55a5ccdcf7e4373a29a84e42a4eb224"
+                  className="box-border cursor-pointer object-cover overflow-hidden shrink-0 mb-auto ml-auto w-full aspect-[0.99] max-w-[32px] min-h-[20px] min-w-[20px] hidden max-lg:block lg:max-2xl:hidden max-md:mb-auto xsm:max-sm:-mt-12 sm:max-md:-mt-12"
+                />
+                </div>
+                {toggleMenu && 
+                <ul className="bg-white text-black p-8 absolute top-0 right-0 flex flex-col items-end gap-4 sm:max-2xl:top-[100%]">
+                    <button onClick={()=>handleMenuToggle(false)} className="float-right"><FaTimes/></button>
+                    <li><Link className={`${pathname==='/' && 'active' } hidden xsm:max-[500px]:block`} href={'/'}>HOME</Link></li>
+                    <li><Link className={`${pathname==='/services' && 'active' } hidden xsm:max-sm:block` } href={'/services'}>SERVICES</Link></li>
+                    <li><Link className={`${pathname==='/about' && 'active' } hidden xsm:max-[700px]:block`} href={'/about'}>ABOUT US</Link></li>
+                    <li><Link className={`${pathname==='/account' && 'active'} hidden xsm:max-md:block`} href={'/account'}>ACCOUNT</Link></li>
+
+                    <button><Link className={`${pathname==='/account' && 'active'} hidden xsm:max-md:block`} href={'/signup'}>Sign Up</Link></button>
+                    {userA ? <button><Link className={`${pathname==='/account' && 'active'} hidden xsm:max-md:block`} href={'/login'}>Logout</Link></button>
+                    : <button><Link className={`${pathname==='/account' && 'active'} hidden xsm:max-md:block`} href={'/login'}>Login</Link></button>
+                    }
+                    </ul>
+                }
+              </div>
             </div>
           </div>
         </div>
