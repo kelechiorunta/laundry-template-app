@@ -225,7 +225,7 @@ export default function Dashboard() {
 
   return (
     
-    <div className="dashboard min-h-screen bg-[#101010] p-4">
+    <div className="dashboard min-h-screen bg-[#101010] p-4 xsm:max-[400px]:min-w-[300px] xsm:max-[400px]:-ml-8">
       {/* {console.log(user)} */}
       {console.log(formData)}
       <div className="max-w-6xl mx-auto flex flex-col md:flex-row bg-white p-6 rounded-lg shadow-lg">
@@ -244,10 +244,10 @@ export default function Dashboard() {
         />
       )}
             <div>
-              <h1 className="text-xl font-bold">{user && user?.displayName}</h1>
+              <h1 className="text-xl font-bold md:w-2/3">{user && user?.displayName}</h1>
               {isPending? 
                     <FaSpinner className="animate-spin mx-auto text-black"/> 
-                    :<p className="text-gray-600 min-w-[20%]">{userEmail}</p>
+                    :<p className="text-gray-600 min-w-[20%] block md:max-[1189px]:hidden xsm:max-[400px]:-indent-8 ">{userEmail}</p>
               }
             </div>
           </div>
@@ -265,7 +265,7 @@ export default function Dashboard() {
         </div>
 
         {/* Main Content Section */}
-        <div className="bg-[rgba(0,0,255,0.2)] bg-contain bg-[url('../../public/imgs/bg_memphis.png')] md:w-2/3 p-4">
+        <div className="bg-[rgba(0,0,255,0.2)] bg-contain bg-[url('../../public/imgs/bg_memphis.png')] md:w-2/3 p-2 ">
           {/* <h2 className="text-2xl font-semibold mb-4">Schedule a Pickup</h2> */}
           <h2 className="text-2xl font-semibold mb-4">Update Profile</h2>
           <form onSubmit={handleSubmit} className="space-y-4">

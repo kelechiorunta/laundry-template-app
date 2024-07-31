@@ -364,7 +364,7 @@ const Profile = ({toggle, connects, setToggle, mergedIds, chats, user, isPending
         </div>
       ) : (
         formData && (
-          <div className="flex flex-col items-center">
+          <div className="flex flex-col items-center ">
             {formData.photoURL || formData.photo ? (
               <img
                 className="rounded-full shadow-xl overflow-hidden bg-center object-fill w-[50px] h-[50px]"
@@ -392,14 +392,15 @@ const Profile = ({toggle, connects, setToggle, mergedIds, chats, user, isPending
                     <FaSpinner className="animate-spin mx-auto text-black"/> 
                     : <div>
                         {foundUsers && 
-                        <ul className='bg-gray-200 rounded-2xl w-full grid p-8 grid-cols-3 shadow-2xl border xsm:max-lg:grid-cols-2'>
+                        <ul className='bg-gray-200 rounded-2xl w-full grid p-8 grid-cols-3 shadow-2xl border xsm:max-lg:grid-cols-2 xsm:max-[400px]:grid-cols-1 xsm:max-[400px]:min-w-[280px]'>
                           <h1 className='font-bold col-span-3 pb-4 xsm:max-lg:col-span-2 auto-cols-fr'>CONNECT AND CHAT</h1>
                           {foundUsers.map((user)=>{
                             return(
-                              <div className='bg-white flex items-center gap-4 border rounded-2xl shadow-md p-4 flex-col justify-between xsm:max-[670px]:col-span-2 xsm:max-lg:col-span-1'>
+                              <div className='bg-white flex items-center gap-4 border rounded-2xl shadow-md p-4 flex-col justify-between xsm:max-[670px]:col-span-2 xsm:max-lg:col-span-1 '>
                                 <div className='overflow-hidden'>
-                                  <img className='rounded-full shadow-md border w-[50px] h-[50px]' 
+                                  {user.photoURL?<img className='rounded-full shadow-md border w-[50px] h-[50px]' 
                                   src={user.photoURL} width={50} height={50} alt='User'/>
+                                  :<p className='rounded-full shadow-lg flex items-center justify-center bg-black text-white w-[50px] h-[50px]'>{user.displayName[0]}</p>}
                                 </div>
                                 {/* {console.log(chats && chats.length>0? chats:"Nothing")} */}
                                 <li className='font-bold text-[17px] text-center'>{user.displayName}</li>
