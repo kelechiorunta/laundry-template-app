@@ -126,9 +126,9 @@
 'use client'
 import { useEffect, useState, useTransition } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { collection, getDocs, query, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc, doc, setDoc, updateDoc } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 // import { db } from './firebase'; // Adjust the path to your Firebase configuration
-import { db } from '../firebase/firebaseConfig';
+import { app, db } from '../firebase/firebaseConfig';
 import { FaPaperPlane } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
 
@@ -139,6 +139,9 @@ const ChatBox = ({ email }) => {
   const [input, setInput] = useState('');
   const [chatId, setChatId] = useState(null);
   const [isPending, startTransition] = useTransition()
+  const [notification, setNotification] = useState('')
+
+  const authChat = getAuth(app)
   
 
   useEffect(() => {
@@ -164,6 +167,9 @@ const ChatBox = ({ email }) => {
                 collection(db, 'chats', chatDocId, 'messages'),
                 orderBy('timestamp', 'asc')
               );
+
+              console.log(recipientUser)
+              console.log(authUser)
     
               const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
                 setMessages(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
@@ -183,17 +189,85 @@ const ChatBox = ({ email }) => {
 
     getChats()
     
-  }, [email]);
+  }, [email, authChat, chatId, authUser]);
+
+  useEffect(() => {
+    const getNotification = () => {
+      startTransition(async () => {
+        try {
+          const auth = getAuth(app);
+          const authuser = auth.currentUser;
+          const authuserId = authuser.uid;
+          const notificationRef = doc(db, 'notifications', authuserId);
+          const notificationSnapshot = await getDoc(notificationRef);
+
+          if (notificationSnapshot.exists()) {
+            const data = notificationSnapshot.data();
+
+            data.sender.forEach((d) => {
+                if (recipientUser.userId == d) {
+                    const unsubscribe = onSnapshot(notificationRef, (snapshot) => {
+                      const notificationData = snapshot.data();
+                      if (d == recipientUser.userId && notificationData.notification && notificationData.time) {
+                        setNotification(notificationData.notification + notificationData.time);
+                        alert(notificationData.notification + ' at ' + notificationData.time);
+      
+                       // // Clear the notification after rendering it
+                      //   updateDoc(notificationRef, {
+                      //     notification: '',
+                      //     // or use this to mark it as read
+                      //     // read: true,
+                      //   });
+                      }
+                    });
+      
+                    return () => {
+                      unsubscribe();
+                    };
+                  }
+            })
+           
+          }
+        } catch (err) {
+          console.error(err.message, "No new notification");
+        }
+      });
+    };
+
+    getNotification();
+  }, [authChat, chatId, email]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
     if (input.trim() && chatId) {
         const userRef = doc(db, 'allchats', chatId)
+        console.log(recipientUser && recipientUser.userId)
+        console.log(authUser && authUser.uid)
+        const usernotificationRef = doc(db, 'notifications', chatId)
         const usersnapshot = await getDoc(userRef)
+        const usernotificationsnapahot = await getDoc(usernotificationRef)
+        if (usernotificationsnapahot && recipientUser && authUser){
+            console.log(recipientUser.displayName)
+            await setDoc(doc(db, 'notifications', chatId), {
+                notification: `${authUser.displayName} posted a chat to you ${recipientUser.displayName}`,
+                sender: arrayUnion(authUser.uid),
+                time: serverTimestamp(),
+                merge: true,
+            
+            })
+          }else{
+            await addDoc(doc(db, 'notifications', chatId), {
+                notification: `${authUser.displayName} posted a chat to you ${recipientUser.displayName}`,
+                sender: arrayUnion[authUser.uid],
+                time: serverTimestamp(),
+            
+            })
+          }
         if (usersnapshot){
             await setDoc(doc(db, 'allchats', chatId), {
-                id:chatId,
+                id:chatId, merge: true,
               });
+              
         }else{
             await addDoc(doc(db, 'allchats', chatId), {
                 id:chatId,

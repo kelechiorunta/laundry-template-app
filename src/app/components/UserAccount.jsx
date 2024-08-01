@@ -3,7 +3,7 @@ import React, { useState } from 'react';
 import { FaUser, FaTruck, FaTshirt, FaSpinner, FaRegistered, FaUserEdit, FaConnectdevelop, FaEnvelopeOpenText } from 'react-icons/fa';
 import { useEffect, useTransition, useContext } from 'react';
 import { getAuth, onAuthStateChanged, updatePhoneNumber, updateProfile } from 'firebase/auth';
-import { updateDoc, doc, collection, getDoc, getDocs } from 'firebase/firestore';
+import { updateDoc, doc, collection, getDoc, getDocs, onSnapshot } from 'firebase/firestore';
 import { app, db } from '../firebase/firebaseConfig';
 import { authContext } from './AuthComponent';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -69,6 +69,7 @@ const UserAccount = () => {
   const [mergedIds, setMergedIds] = useState([])
   const [connects, setConnects] = useState([])
   const [toggle, setToggle] = useState(null)
+  const [notificationSenders, setNotificationSenders] = useState([])
   
     useEffect(()=>{
         
@@ -146,12 +147,7 @@ const UserAccount = () => {
                 //  const userRef = doc(db, 'users', userPid);
                 const pickupRef = doc(db, 'pickups', userPid);
                 const pickupRefsnapshot = await getDoc(pickupRef);
-                // const userRefsnapshot = await getDoc(userRef);
-    
-                // if (userRefsnapshot.exists()) {
-                //   const data = userRefsnapshot.data();
-                //   setFormData(data);
-                // }
+                
     
                 if (pickupRefsnapshot.exists()) {
                     const pickupdata = pickupRefsnapshot.data();
@@ -176,6 +172,14 @@ const UserAccount = () => {
       function getUsersById(users, text) {
         return users.filter(user => {return text.includes(user.userId)});
       }
+      const foundfriends = new Set()
+      function filterConnectsBySenderId(friends, id){
+        
+        ///id is now an array
+         id.forEach(i=>{
+        foundfriends.add(friends && friends.find(friend => {return (friend.userId == i)}))})
+        return foundfriends
+      }
 
       ///////
      
@@ -190,6 +194,10 @@ const UserAccount = () => {
               if (authUserToken) {
                 const usersRef = collection(db, 'users');
                 const chatsRef = collection(db, 'allchats');
+
+                // const notificationRef = doc(db, 'notifications', authUser.uid)
+                // const notificationRefSnapshot = await getDoc(notificationRef)
+
                 const chatsSnapshot = await getDocs(chatsRef);
                 
                 const [usersRefsnapshot, chatsRefsnapshot] = await Promise.all([
@@ -221,12 +229,71 @@ const UserAccount = () => {
                 const otherUsers = usersArray.filter(user => user.displayName !== authUser.displayName);
                 setFoundUsers(otherUsers);
 
+                console.log(otherUsers)
+
+                
                 const newarray = [];
+                const sendersarray = [];
+                var senders = [];
                 filteredArray && filteredArray.forEach(i => {
                
-                    newarray.push(getUsersById(otherUsers, i)[0])
+                    newarray.push(getUsersById(otherUsers, i)[0]) //This is to extract other users merged in a chat with the current authenticated User
                     console.log(newarray)
                     setConnects(newarray)
+
+                    otherUsers.forEach(async(user)=>{
+                      const chatDocId = [authUser.uid, user.userId].sort().join('_');
+                      // sliceditems.push[chatDocId]
+                      // console.log(sliceditems)
+                      const notificationRef = doc(db, 'notifications', chatDocId)
+                      const notificationRefSnapshot = await getDoc(notificationRef)
+                      // console.log(notificationRef)
+                      if (notificationRefSnapshot.exists()){
+                        console.log(notificationRefSnapshot.data())
+                        const unsubscribe = onSnapshot(notificationRef, (snapshot) => {
+                          if (snapshot){
+                            const data = snapshot.data()
+                            
+                            senders = (filterConnectsBySenderId(newarray, data.sender))
+                            console.log(senders)
+                            
+                            setNotificationSenders(senders)
+                            console.log(notificationRefSnapshot.data)
+    
+                            // updateDoc(notificationRef, {
+                            //   notification: '',
+                            //   // or use this to mark it as read
+                            //   // read: true,
+                            // });
+                          }
+                          
+                        })
+                        
+                        return () => unsubscribe()
+                      }
+                      
+                    })
+                    // setNotificationSenders(senders)
+
+                    // if (notificationRefSnapshot.exists()){
+                    //   const unsubscribe = onSnapshot(notificationRef, (snapshot) => {
+                    //     if (snapshot){
+                    //       const data = snapshot.data()
+                          
+                    //       const senders = filterConnectsBySenderId(newarray, data.sender)
+                    //       // senders.push()
+                    //       setNotificationSenders(senders)
+                    //       console.log(senders)
+
+                    //       // updateDoc(notificationRef, {
+                    //       //   notification: '',
+                    //       //   // or use this to mark it as read
+                    //       //   // read: true,
+                    //       // });
+                    //     }
+                    //   })
+                    //   return () => unsubscribe()
+                    // }
                    })
                 
               }
@@ -246,7 +313,7 @@ const UserAccount = () => {
   const renderContent = ({allMessages, user, chats, mergedIds, isPendingLikes}) => {
     switch (selectedTab) {
       case 'profile':
-        return <div><Profile setToggle={setToggle} toggle={toggle} connects={connects} allMessages={allMessages} isPendingLikes={isPendingLikes} mergedIds={mergedIds} chats={chats} pendingUsers={pendingUsers} foundUsers={foundUsers} isProfileActive={selectedTab === 'profile'} pickupData={pickupData} setPickupData={setPickupData} user={user} dataFetched={dataFetched} setDataFetched={setDataFetched} startTransition={startTransition} formData={formData} setFormData={setFormData} isPending={isPending} authO={authO} /></div>;
+        return <div><Profile notificationSenders={notificationSenders} setToggle={setToggle} toggle={toggle} connects={connects} allMessages={allMessages} isPendingLikes={isPendingLikes} mergedIds={mergedIds} chats={chats} pendingUsers={pendingUsers} foundUsers={foundUsers} isProfileActive={selectedTab === 'profile'} pickupData={pickupData} setPickupData={setPickupData} user={user} dataFetched={dataFetched} setDataFetched={setDataFetched} startTransition={startTransition} formData={formData} setFormData={setFormData} isPending={isPending} authO={authO} /></div>;
       case 'pickups':
         return <Pickups user={user} formData={formData} />;
       case 'update':
@@ -302,7 +369,7 @@ const UserAccount = () => {
   );
 };
 
-const Profile = ({toggle, connects, setToggle, mergedIds, chats, user, isPendingLikes, pendingUsers, foundUsers,  isProfileActive, pickupData, formData, isPending, setFormData, setPickupData, authO,  startTransition, dataFetched, setDataFetched}) => {
+const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, chats, user, isPendingLikes, pendingUsers, foundUsers,  isProfileActive, pickupData, formData, isPending, setFormData, setPickupData, authO,  startTransition, dataFetched, setDataFetched}) => {
   
   useEffect(() => {
     if (isProfileActive) { // Fetch only if Profile tab is active
@@ -380,7 +447,26 @@ const Profile = ({toggle, connects, setToggle, mergedIds, chats, user, isPending
             <p className="text-gray-600">{formData.email}</p>
             <p className="text-gray-600">{formData.phone}</p>
             {console.log(connects)}
-            {isPendingLikes? <p>Loading</p>:<p className='uppercase font-bold'>{`${formData.name} has ${chats && chats} connect${chats<2?'':'s'}`}</p>}
+            {isPendingLikes? <p>Loading</p>:
+            <div className='flex flex-col items-center gap-y-4'>
+              <p className='uppercase font-bold'>{`${formData.name} has ${chats && chats} connect${chats<2?'':'s'}`}</p>
+              <div className='relative flex items-center gap-x-4 w-full'>
+              {notificationSenders && Array.from(notificationSenders).map(sender=>{
+                return (
+                  
+                  <div className='relative'>
+                    <img src={sender && sender.photoURL} className='relative w-[50px] h-[50px] rounded-full shadow-md border
+                    bg-black text-white justify-center items-center flex' alt={sender && sender.displayName[0]} />
+                    <span className='absolute w-[25px] h-[25px] flex items-center rounded-full shadow-md -bottom-4 right-4
+                    justify-center bg-white text-red-500'>{sender && sender.displayName[0]}</span>
+                  </div>
+                  
+                )
+              })}
+              </div>
+              <span>These have sent notifications. Please check chat arena.</span>
+            </div>
+            }
             <div className='relative '>
             {<span className='relative cursor-pointer' onMouseEnter={()=>setToggle(true)} onMouseOut={()=>setToggle(false)}>CHECK FRIENDS</span>}
             {toggle && 
