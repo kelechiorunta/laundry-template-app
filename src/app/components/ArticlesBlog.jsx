@@ -31,12 +31,12 @@ export default function ArticlesBlog() {
                           </div>
                         </div>
                       </div>
-                      <div className="box-border flex relative flex-col shrink-0 px-5 py-2.5 mt-5 rounded border-0 border-solid bg-black bg-opacity-50 border-[black] max-md:pr-5 max-md:pb-5">
+                      <div className="box-border flex relative flex-col items-center shrink-0 px-5 py-2.5 mt-5 rounded border-0 border-solid bg-black bg-opacity-50 border-[black] max-md:pr-5 max-md:pb-5">
                         <div className="flex gap-5 max-md:flex-col max-md:gap-0 max-lg:flex-wrap">
-                          <div className="flex flex-col w-[33%] max-md:ml-0 max-md:w-full max-lg:w-full">
+                          <div className="flex flex-col items-center justify-center w-[33%] max-md:ml-0 max-md:w-full max-lg:w-full">
                             <div className="box-border flex relative flex-col shrink-0 p-2.5 mt-5 bg-white rounded-lg border border-black border-solid shadow-sm">
                               <div className="flex gap-5 max-md:flex-col max-md:gap-0">
-                                <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
+                                <div className="flex flex-col items-center w-full max-md:ml-0 max-md:w-full">
                                   <img
                                     loading="lazy"
                                     srcSet="https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Fc2f5550b71904a0cacf85e7518915f06?width=100 100w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Fc2f5550b71904a0cacf85e7518915f06?width=200 200w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Fc2f5550b71904a0cacf85e7518915f06?width=400 400w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Fc2f5550b71904a0cacf85e7518915f06?width=800 800w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Fc2f5550b71904a0cacf85e7518915f06?width=1200 1200w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Fc2f5550b71904a0cacf85e7518915f06?width=1600 1600w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Fc2f5550b71904a0cacf85e7518915f06?width=2000 2000w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Fc2f5550b71904a0cacf85e7518915f06"
@@ -48,20 +48,20 @@ export default function ArticlesBlog() {
                                         // class="p1"
                                         className="text-sm normal-nums  leading-[normal] text-start tracking-[normal]"
                                       >
-                                        <span className="mx-auto text-base leading-6">
-                                          <font
+                                        <span className="mx-auto text-base leading-6 text-[#000000]">
+                                          {/* <font
                                             face="Manrope, sans-serif"
                                             color="#000000"
-                                          >
+                                          > */}
                                             <span className="mx-auto text-2xl text-center">
                                               Laundry Tips
                                             </span>
-                                          </font>
+                                          {/* </font> */}
                                         </span>
                                       </p>
                                     </blockquote>
                                   </div>
-                                  <div className="box-border relative shrink-0 p-1.5 mx-auto mt-5 h-auto text-base leading-6 rounded border border-dotted border-neutral-600">
+                                  <div className="box-border relative shrink-0 p-1.5 mx-auto mt-5 h-auto text-base leading-6 rounded-md shadow-xl border-neutral-600">
                                     <span className="text-black"> 
                                     {/* style='color: rgb(0, 0, 0); font-family: "Helvetica Neue"; font-size: 13px;'> */}
                                       Vestibulum pede vivamus natoque egestas
@@ -102,20 +102,20 @@ export default function ArticlesBlog() {
                                         // class="p1"
                                         className="text-sm normal-nums  leading-[normal] text-start tracking-[normal]"
                                       >
-                                        <span className="mx-auto text-base leading-6">
-                                          <font
+                                        <span className="mx-auto text-base leading-6 text-[#000000]">
+                                          {/* <font
                                             face="Manrope, sans-serif"
                                             color="#000000"
-                                          >
+                                          > */}
                                             <span className="mx-auto text-2xl text-center">
                                               Treatment Tips
                                             </span>
-                                          </font>
+                                          {/* </font> */}
                                         </span>
                                       </p>
                                     </blockquote>
                                   </div>
-                                  <div className="box-border relative shrink-0 p-1.5 mx-auto mt-5 h-auto text-base leading-6 rounded border border-dotted border-neutral-600">
+                                  <div className="box-border relative shrink-0 p-1.5 mx-auto mt-5 h-auto text-base leading-6 rounded-md shadow-xl border-neutral-600">
                                     <span className="text-black">
                                        {/* style='color: rgb(0, 0, 0); font-family: "Helvetica Neue"; font-size: 13px;'> */}
                                       Vestibulum pede vivamus natoque egestas
@@ -156,20 +156,20 @@ export default function ArticlesBlog() {
                                         // class="p1"
                                         className="text-sm normal-nums  leading-[normal] text-start tracking-[normal]"
                                       >
-                                        <span className="mx-auto text-base leading-6">
-                                          <font
+                                        <span className="mx-auto text-base leading-6 text-[#000000]">
+                                          {/* <font
                                             face="Manrope, sans-serif"
                                             color="#000000"
-                                          >
-                                            <span className="mx-auto text-2xl text-center">
+                                          > */}
+                                            <span className="mx-auto w-full text-2xl text-center">
                                               Delivery Tips
                                             </span>
-                                          </font>
+                                          {/* </font> */}
                                         </span>
                                       </p>
                                     </blockquote>
                                   </div>
-                                  <div className="box-border relative shrink-0 p-1.5 mx-auto mt-5 h-auto text-base leading-6 rounded border border-dotted border-neutral-600">
+                                  <div className="box-border relative shrink-0 p-1.5 mx-auto mt-5 h-auto text-base leading-6 rounded-md shadow-xl border-neutral-600">
                                     <span className="text-black">
                                        {/* style='color: rgb(0, 0, 0); font-family: "Helvetica Neue"; font-size: 13px;'> */}
                                       Vestibulum pede vivamus natoque egestas

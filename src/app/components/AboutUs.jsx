@@ -89,30 +89,31 @@ export default function AboutUs() {
             <div className="flex gap-5 max-md:flex-col max-md:gap-0">
               <div className="flex flex-col w-full -mt-36 max-md:ml-0 max-md:w-full">
                 <div ref={(el) => childRefs.current[0] = el} className="box-border relative shrink-0 mt-5 h-auto">
-                  <font color="#ffffff">About Us</font>
+                  {/* <font color="#ffffff">About Us</font> */}
+                  <p className="text-[#ffffff]">About Us</p>
                 </div>
                 <div className="box-border relative shrink-0 mt-5 h-auto">
                   <h1
                     // class="elementor-heading-title elementor-size-default"
                     className="p-0 font-[var(_--e-global-typography-583e54c-font-weight_)] leading-[var(_--e-global-typography-583e54c-line-height_)] text-[var(_--e-global-typography-583e54c-font-size_)] tracking-[var(_--e-global-typography-583e54c-letter-spacing_)]"
                   >
-                    <font face="Manrope, sans-serif">
-                      <font color="#ffffff">
-                        <span ref={(el) => childRefs.current[1] = el} className="text-5xl font-black leading-10">
+                    {/* <font face="Manrope, sans-serif"> */}
+                      {/* <font color="#ffffff"> */}
+                        <span ref={(el) => childRefs.current[1] = el} className="text-5xl text-[#ffffff] font-black leading-10">
                           Discover Us
                         </span>
-                      </font>
-                    </font>
+                      {/* </font> */}
+                    {/* </font> */}
                   </h1>
                 </div>
                 <div ref={(el) => childRefs.current[2] = el} className="box-border relative shrink-0 mt-5 mr-auto h-auto text-base leading-6">
                   <p
-                    class="p1"
+                    // class="p1"
                     className="text-sm normal-nums  leading-[normal] text-start tracking-[normal]"
                   >
-                    <span className="text-base leading-6">
-                      <font face="Manrope, sans-serif">
-                        <font color="#ffffff"></font>
+                    <span className="text-base leading-6 text-[#ffffff]">
+                      {/* <font face="Manrope, sans-serif"> */}
+                        {/* <font color="#ffffff"></font> */}
                         <span className="text-base">
                           <span className="text-base">
                             <span className="text-base">
@@ -202,10 +203,10 @@ export default function AboutUs() {
                             </span>
                           </span>
                         </span>
-                        <span className="text-lg">
-                          <font color="#ffffff"></font>
+                        <span className="text-lg text-[#ffffff">
+                          {/* <font color="#ffffff"></font> */}
                         </span>
-                      </font>
+                      {/* </font> */}
                     </span>
                   </p>
                 </div>
@@ -214,7 +215,7 @@ export default function AboutUs() {
                     <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
                       <button
                         className="box-border relative shrink-0 p-5 mx-auto mt-5 leading-6 text-center
-                         bg-blue-600 rounded appearance-none cursor-pointer text-[white] w-[212.4px]  hover:bg-white hover:text-blue-600 transition-all"
+                         bg-blue-600 rounded appearance-none cursor-pointer text-[white] w-[212.4px] hover:bg-white hover:text-blue-600 transition-all"
                         onClick={(event) => {
                           /**
                            * Global objects available in custom action code:

@@ -5,22 +5,22 @@ import * as React from "react";
 
 export default function WhyChooseUs() {
   return (
-    <div className="box-border flex relative z-10 flex-col shrink-0 px-8 py-5 mt-5 bg-white rounded border border-solid shadow-sm border-[black]">
+    <div className="box-border flex relative z-10 flex-col shrink-0 px-8 py-5 mt-5 bg-white rounded shadow-md border-[black]">
       <div className="flex gap-5 max-md:flex-col max-md:gap-0">
         <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
           <div className="box-border relative shrink-0 mt-5 h-auto">
-            <span className="text-base leading-6">
-              <font face="Manrope, sans-serif" color="#032b56">
+            <span className="text-base leading-6 text-[#032b56]">
+              {/* <font face="Manrope, sans-serif" color="#032b56"> */}
                 Why Choose Us
-              </font>
+              {/* </font> */}
             </span>
           </div>
           <div className="box-border relative shrink-0 mt-6 h-auto text-4xl leading-10">
-            <font face="Manrope, sans-serif" color="#032b56">
-              <span className="text-5xl leading-10">
+            {/* <font face="Manrope, sans-serif" color="#032b56"> */}
+              <span className="text-5xl leading-10 text-[#032b56]">
                 A better you start with clean clothes
               </span>
-            </font>
+            {/* </font> */}
           </div>
         </div>
         <div className="flex flex-col ml-5 w-6/12 max-md:ml-0 max-md:w-full">
@@ -29,12 +29,12 @@ export default function WhyChooseUs() {
               // class="p1"
               // style='font-variant-numeric: normal; font-variant-east-asian: normal; font-variant-alternates: normal; font-kerning: auto; font-optical-sizing: auto; font-feature-settings: normal; font-variation-settings: normal; font-variant-position: normal; font-weight: 400; font-stretch: normal; font-size: 13px; line-height: normal; font-family: "Helvetica Neue"; letter-spacing: normal; text-align: start;'
             >
-              <span className="text-base leading-6">
-                <font color="#032b56">
+              <span className="text-base leading-6 text-[#032b56]">
+                {/* <font color="#032b56"> */}
                   Vestibulum pede vivamus natoque egestas risus integer mi
                   euismod sodales amet. Conubia natoque dis rutrum cras
                   ultricies facilisi sodales justo molestie scelerisque ligula.
-                </font>
+                {/* </font> */}
               </span>
             </p>
           </div>

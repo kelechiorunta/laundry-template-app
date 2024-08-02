@@ -22,21 +22,21 @@ export default function Testimonials() {
                       </div>
                       <div className="box-border relative shrink-0 mt-5 h-auto text-base text-white">
                         <p
-                          class="p1"
+                          // class="p1"
                           className="text-sm normal-nums  leading-[normal] text-start tracking-[normal]"
                         >
                           <span className="text-base leading-6">
-                            <font face="Manrope, sans-serif">
+                            {/* <font face="Manrope, sans-serif"> */}
                               Arcu eget malesuada imperdiet ornare pretium
                               fringilla elit
-                            </font>
-                            <font face="Manrope, sans-serif"> </font>
-                            <font face="Manrope, sans-serif">
+                            {/* </font> */}
+                            {/* <font face="Manrope, sans-serif"> </font> */}
+                            {/* <font face="Manrope, sans-serif"> */}
                               nullam. Orci elementum nec netus placerat
                               convallis cursus class diam arcu tincidunt sed.
                               Dolor tristique parturient consequat suscipit
                               malesuada viverra proin commodo.
-                            </font>
+                            {/* </font> */}
                           </span>
                         </p>
                       </div>
@@ -57,17 +57,17 @@ export default function Testimonials() {
                                         // class="p1"
                                         className="text-sm normal-nums  leading-[normal] text-start tracking-[normal]"
                                       >
-                                        <span className="mx-auto text-base leading-6">
-                                          <font
+                                        <span className="mx-auto text-base leading-6 text-[#000000]">
+                                          {/* <font
                                             face="Manrope, sans-serif"
                                             color="#000000"
-                                          >
-                                            <span className="mx-auto text-center">
+                                          > */}
+                                            <span className="mx-auto text-center text-[#000000]">
                                               Montes dictum faucibus rutrum
                                               morbi sagittis blandit iaculis
                                               posuere neque nunc ac tortor
                                             </span>
-                                          </font>
+                                          {/* </font> */}
                                         </span>
                                       </p>
                                     </blockquote>
@@ -77,14 +77,14 @@ export default function Testimonials() {
                                     srcSet="https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2F954ca1b65f8e4bf08d3de07289bca995?width=100 100w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2F954ca1b65f8e4bf08d3de07289bca995?width=200 200w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2F954ca1b65f8e4bf08d3de07289bca995?width=400 400w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2F954ca1b65f8e4bf08d3de07289bca995?width=800 800w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2F954ca1b65f8e4bf08d3de07289bca995?width=1200 1200w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2F954ca1b65f8e4bf08d3de07289bca995?width=1600 1600w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2F954ca1b65f8e4bf08d3de07289bca995?width=2000 2000w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2F954ca1b65f8e4bf08d3de07289bca995"
                                     className="box-border object-cover overflow-hidden shrink-0 mx-auto mt-5 w-full aspect-square max-w-[100px] min-h-[20px] min-w-[20px] rounded-[50px]"
                                   />
-                                  <div className="box-border relative shrink-0 mx-auto mt-5 h-auto">
-                                    <font color="#000000">
-                                      <font face="Manrope, sans-serif">
-                                        <span className="mx-auto leading-6">
+                                  <div className="box-border relative shrink-0 mx-auto mt-5 h-auto text-[#000000]">
+                                    {/* <font color="#000000"> */}
+                                      {/* <font face="Manrope, sans-serif"> */}
+                                        <span className="mx-auto leading-6 text-[#000000]">
                                           Lilian Bell
                                         </span>
-                                      </font>
-                                    </font>
+                                      {/* </font> */}
+                                    {/* </font> */}
                                   </div>
                                   <div className="box-border flex relative flex-row shrink-0 mx-auto mt-5 max-w-[250px]">
                                     <div className="box-border flex relative flex-col shrink-0 mx-auto -mt-5">
@@ -146,17 +146,17 @@ export default function Testimonials() {
                                         // class="p1"
                                         className="text-sm normal-nums  leading-[normal] text-start tracking-[normal]"
                                       >
-                                        <span className="mx-auto text-base leading-6">
-                                          <font
+                                        <span className="mx-auto text-base leading-6 text-[#000000]">
+                                          {/* <font
                                             face="Manrope, sans-serif"
                                             color="#000000"
-                                          >
-                                            <span className="mx-auto text-center">
+                                          > */}
+                                            <span className="mx-auto text-center text-[#000000]">
                                               Montes dictum faucibus rutrum
                                               morbi sagittis blandit iaculis
                                               posuere neque nunc ac tortor
                                             </span>
-                                          </font>
+                                          {/* </font> */}
                                         </span>
                                       </p>
                                     </blockquote>
@@ -167,13 +167,13 @@ export default function Testimonials() {
                                     className="box-border object-cover overflow-hidden shrink-0 mx-auto mt-5 w-full aspect-square max-w-[100px] min-h-[20px] min-w-[20px] rounded-[50px]"
                                   />
                                   <div className="box-border relative shrink-0 mx-auto mt-5 h-auto">
-                                    <font color="#000000">
-                                      <span className="mx-auto leading-6">
-                                        <font face="Manrope, sans-serif">
+                                    {/* <font color="#000000"> */}
+                                      <span className="mx-auto leading-6 text-[#000000]">
+                                        {/* <font face="Manrope, sans-serif"> */}
                                           Vivian Ashley
-                                        </font>
+                                        {/* </font> */}
                                       </span>
-                                    </font>
+                                    {/* </font> */}
                                   </div>
                                   <div className="box-border flex relative flex-row shrink-0 mx-auto mt-5 max-w-[250px]">
                                     <div className="box-border flex relative flex-col shrink-0 mx-auto -mt-5">
@@ -232,20 +232,20 @@ export default function Testimonials() {
                                   <div className="box-border relative shrink-0 mt-5 h-auto">
                                     <blockquote className="p-0 my-0 mr-0 ml-10 border-[none]">
                                       <p
-                                        class="p1"
+                                        // class="p1"
                                         className="text-sm normal-nums  leading-[normal] text-start tracking-[normal]"
                                       >
                                         <span className="mx-auto text-base leading-6">
-                                          <font
+                                          {/* <font
                                             face="Manrope, sans-serif"
                                             color="#000000"
-                                          >
-                                            <span className="mx-auto text-center">
+                                          > */}
+                                            <span className="mx-auto text-center text-[#000000]">
                                               Montes dictum faucibus rutrum
                                               morbi sagittis blandit iaculis
                                               posuere neque nunc ac tortor
                                             </span>
-                                          </font>
+                                          {/* </font> */}
                                         </span>
                                       </p>
                                     </blockquote>

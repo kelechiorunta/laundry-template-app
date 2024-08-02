@@ -23,17 +23,17 @@ export default function CallToAction() {
                     className="text-sm normal-nums  leading-[normal] text-start tracking-[normal]"
                   >
                     <span className="text-base leading-6">
-                      <font face="Manrope, sans-serif">
+                      {/* <font face="Manrope, sans-serif"> */}
                         Arcu eget malesuada imperdiet ornare pretium fringilla
                         elit
-                      </font>
-                      <font face="Manrope, sans-serif"> </font>
-                      <font face="Manrope, sans-serif">
+                      {/* </font> */}
+                      {/* <font face="Manrope, sans-serif"> </font> */}
+                      {/* <font face="Manrope, sans-serif"> */}
                         nullam. Orci elementum nec netus placerat convallis
                         cursus class diam arcu tincidunt sed. Dolor tristique
                         parturient consequat suscipit malesuada viverra proin
                         commodo.
-                      </font>
+                      {/* </font> */}
                     </span>
                   </p>
                 </div>

@@ -124,7 +124,7 @@
 
 // export default ChatBox;
 'use client'
-import { useEffect, useState, useTransition } from 'react';
+import { useEffect, useState, useTransition, useRef } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs, query, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 // import { db } from './firebase'; // Adjust the path to your Firebase configuration
@@ -143,6 +143,19 @@ const ChatBox = ({ email }) => {
 
   const authChat = getAuth(app)
   
+  const messagesEndRef = useRef(null);
+
+  // Function to scroll to the bottom
+  const scrollToBottom = () => {
+    if (messagesEndRef.current) {
+      messagesEndRef.current.scrollIntoView({ behavior: 'smooth' });
+    }
+  };
+
+  // Scroll to the bottom whenever messages change
+  useEffect(() => {
+    scrollToBottom();
+  }, [messages]);
 
   useEffect(() => {
     const getChats = () => {
@@ -302,6 +315,7 @@ const ChatBox = ({ email }) => {
             <div className="flex flex-col h-full overflow-y-auto mb-4">
            {messages.map((msg) => (
             <div
+              ref={messagesEndRef}
               key={msg.id}
               className={`flex ${msg.senderId === authUser.uid ? 'justify-end' : 'justify-start'} mb-2  border-y-gray-400 border-x-0 py-4`}
             >
@@ -314,7 +328,10 @@ const ChatBox = ({ email }) => {
             </div>
           ))}
          </div>)
+          
 }
+            {/* <div ref={messagesEndRef} /> {/* This div will be used to scroll into view */}
+                    {/* </div>  */}
             
             <form onSubmit={sendMessage} className="flex items-center">
               <input

@@ -227,7 +227,7 @@ export default function DiscoverService() {
                 <div className="box-border flex relative flex-col shrink-0 px-10 pb-10 mt-6 bg-white shadow-sm max-sm:px-5">
                   <div className="flex gap-5 max-md:flex-col max-md:gap-0 max-lg:flex-wrap">
                     <div className="flex flex-col w-[33%] max-md:ml-0 max-md:w-full max-lg:w-[100%]">
-                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl border border-solid shadow-sm border-[black]">
+                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl shadow-2xl border-[black]">
                         <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
                             <img
@@ -259,7 +259,7 @@ export default function DiscoverService() {
                       </div>
                     </div>
                     <div className="flex flex-col ml-5 w-[33%] max-md:ml-0 max-md:w-full">
-                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl border border-solid shadow-sm border-[black]">
+                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl shadow-2xl border-[black]">
                         <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
                             <img
@@ -291,7 +291,7 @@ export default function DiscoverService() {
                       </div>
                     </div>
                     <div className="flex flex-col ml-5 w-[33%] max-md:ml-0 max-md:w-full">
-                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl border border-solid shadow-sm border-[black]">
+                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl shadow-2xl border-[black]">
                         <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
                             <img
@@ -327,7 +327,7 @@ export default function DiscoverService() {
                 <div className="box-border flex relative flex-col shrink-0 px-10 pb-10 mt-6 bg-white shadow-sm max-sm:px-5">
                   <div className="flex gap-5 max-md:flex-col max-md:gap-0 max-lg:flex-wrap w-[100%]">
                     <div className="flex flex-col w-[33%] max-md:ml-0 max-md:w-full max-lg:w-[100%]">
-                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl border border-solid shadow-sm border-[black]">
+                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl shadow-2xl border-[black]">
                         <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
                             <img
@@ -359,7 +359,7 @@ export default function DiscoverService() {
                       </div>
                     </div>
                     <div className="flex flex-col ml-5 w-[33%] max-md:ml-0 max-md:w-full">
-                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl border border-solid shadow-sm border-[black]">
+                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl shadow-2xl border-[black]">
                         <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
                             <img
@@ -391,7 +391,7 @@ export default function DiscoverService() {
                       </div>
                     </div>
                     <div className="flex flex-col ml-5 w-[33%] max-md:ml-0 max-md:w-full">
-                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl border border-solid shadow-sm border-[black]">
+                      <div className="box-border flex relative flex-col shrink-0 px-5 pb-8 mt-5 rounded-xl shadow-2xl border-[black]">
                         <div className="flex gap-5 max-md:flex-col max-md:gap-0">
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
                             <img

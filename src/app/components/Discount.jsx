@@ -54,10 +54,10 @@ export default function Discount() {
             <div className="z-20 flex gap-5 max-md:flex-col max-md:gap-0">
               <div className="flex flex-col w-6/12 max-md:ml-0 max-md:w-full">
                 <div className="box-border relative shrink-0 mt-6 h-auto">
-                  <span className="text-base leading-6">
-                    <font face="Manrope, sans-serif" color="#ffffff">
+                  <span className="text-base leading-6 text-[#ffffff]">
+                    {/* <font face="Manrope, sans-serif" color="#ffffff"> */}
                       About&nbsp; Promo
-                    </font>
+                    {/* </font> */}
                   </span>
                 </div>
                 <div className="box-border relative shrink-0 mt-6 h-auto text-4xl leading-10 text-white">
@@ -69,17 +69,17 @@ export default function Discount() {
                     className="text-sm normal-nums  leading-[normal] text-start tracking-[normal]"
                   >
                     <span className="text-base leading-6">
-                      <font face="Manrope, sans-serif">
+                      {/* <font face="Manrope, sans-serif"> */}
                         Lorem ipsum dolor sit amet, consectetur adipiscing elit.
                         Ut elit tellus, luctus nec ullamcorper mattis, pulvinar
                         dapibus leo
-                      </font>
+                      {/* </font> */}
                     </span>
                   </p>
                 </div>
                 <button
                   className="box-border relative shrink-0 px-6 py-4 mt-5 mr-auto text-center bg-blue-600 rounded appearance-none cursor-pointer text-[white]"
-                  openLinkInNewTab={false}
+                  // openLinkInNewTab={false}
                 >
                   Discover Promo
                 </button>

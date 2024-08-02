@@ -1,6 +1,6 @@
 'use client'
 import React, { useState } from 'react';
-import { FaUser, FaTruck, FaTshirt, FaSpinner, FaRegistered, FaUserEdit, FaConnectdevelop, FaEnvelopeOpenText } from 'react-icons/fa';
+import { FaUser, FaTruck, FaTshirt, FaSpinner, FaRegistered, FaUserEdit, FaConnectdevelop, FaEnvelopeOpenText, FaShoppingBasket } from 'react-icons/fa';
 import { useEffect, useTransition, useContext } from 'react';
 import { getAuth, onAuthStateChanged, updatePhoneNumber, updateProfile } from 'firebase/auth';
 import { updateDoc, doc, collection, getDoc, getDocs, onSnapshot } from 'firebase/firestore';
@@ -12,6 +12,7 @@ import Skeleton from 'react-loading-skeleton';
 import { FaUserCircle } from 'react-icons/fa';
 import Link from 'next/link';
 import Dashboard from './DashBoard';
+import Pickup from './Pickup';
 import { FaPants, FaHat, FaPlus, FaMinus } from 'react-icons/fa';
 // import LaundryPickupForm from './LaundryPickupForm';
 import LaundryPickupForm from './LaundryPickupForm';
@@ -323,6 +324,8 @@ const UserAccount = () => {
         // return <LaundryPickupForm/>;
       case 'registerWares':
         return <RegisterWares formData={formData} setFormData={setFormData} isPending={isPending}/>;
+      case 'savedPickups':
+        return <Pickup />
       default:
         return <Profile chats={chats} user={user}/>;
     }
@@ -358,6 +361,9 @@ const UserAccount = () => {
             </li>
             <li onClick={() => setSelectedTab('registerWares')} className="p-4 hover:bg-gray-700 cursor-pointer">
               <FaTshirt className="inline-block mr-2" /> Book an Appointment
+            </li>
+            <li onClick={() => setSelectedTab('savedPickups')} className="p-4 hover:bg-gray-700 cursor-pointer">
+              <FaShoppingBasket className="inline-block mr-2" /> View Pickups
             </li>
           </ul>
         </nav>
@@ -450,21 +456,25 @@ const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, c
             {isPendingLikes? <p>Loading</p>:
             <div className='flex flex-col items-center gap-y-4'>
               <p className='uppercase font-bold'>{`${formData.name} has ${chats && chats} connect${chats<2?'':'s'}`}</p>
-              <div className='relative flex items-center gap-x-4 w-full'>
+              <div className='relative flex items-center '>
               {notificationSenders && Array.from(notificationSenders).map(sender=>{
                 return (
                   
                   <div className='relative'>
-                    <img src={sender && sender.photoURL} className='relative w-[50px] h-[50px] rounded-full shadow-md border
-                    bg-black text-white justify-center items-center flex' alt={sender && sender.displayName[0]} />
+                    {sender && 
+                    <>
+                    <Link href={`/chat/${encodeURIComponent(sender && sender.email)}`}><img src={sender && sender.photoURL} className='relative w-[50px] h-[50px] rounded-full shadow-md border
+                    bg-black text-white justify-center items-center flex' alt={sender && sender.displayName[0]} /></Link>
                     <span className='absolute w-[25px] h-[25px] flex items-center rounded-full shadow-md -bottom-4 right-4
-                    justify-center bg-white text-red-500'>{sender && sender.displayName[0]}</span>
+                    justify-center bg-white text-red-500'>{sender && sender.displayName[0]}
+                    </span>
+                    </>}
                   </div>
                   
                 )
               })}
               </div>
-              <span>These have sent notifications. Please check chat arena.</span>
+              {((Array.from(notificationSenders))[0] !== undefined) && <span>These have sent notifications. Please check chat arena.</span>}
             </div>
             }
             <div className='relative '>

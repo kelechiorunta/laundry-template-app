@@ -97,18 +97,18 @@ export default function About() {
                       <div className="box-border relative shrink-0 mt-5 h-auto text-base">
                         <p
                           ref={(el) => childRefs.current[2] = el}
-                          class="p1"
+                          // class="p1"
                           className="text-sm normal-nums  leading-[normal] text-start tracking-[normal]"
                         >
-                          <span className="text-base leading-6">
-                            <font face="Manrope, sans-serif" color="#506b89">
+                          <span className="text-base leading-6 text-[#506b89]">
+                            {/* <font face="Manrope, sans-serif" color="#506b89"> */}
                               Arcu eget malesuada imperdiet ornare pretium
                               fringilla elit nullam. Orci elementum nec netus
                               placerat convallis cursus class diam arcu
                               tincidunt sed. Dolor tristique parturient
                               consequat suscipit malesuada viverra proin
                               commodo.
-                            </font>
+                            {/* </font> */}
                           </span>
                         </p>
                       </div>
