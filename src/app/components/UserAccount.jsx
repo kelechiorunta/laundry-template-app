@@ -244,11 +244,10 @@ const UserAccount = () => {
 
                     otherUsers.forEach(async(user)=>{
                       const chatDocId = [authUser.uid, user.userId].sort().join('_');
-                      // sliceditems.push[chatDocId]
-                      // console.log(sliceditems)
+                      
                       const notificationRef = doc(db, 'notifications', chatDocId)
                       const notificationRefSnapshot = await getDoc(notificationRef)
-                      // console.log(notificationRef)
+                      
                       if (notificationRefSnapshot.exists()){
                         console.log(notificationRefSnapshot.data())
                         const unsubscribe = onSnapshot(notificationRef, (snapshot) => {
@@ -274,27 +273,7 @@ const UserAccount = () => {
                       }
                       
                     })
-                    // setNotificationSenders(senders)
-
-                    // if (notificationRefSnapshot.exists()){
-                    //   const unsubscribe = onSnapshot(notificationRef, (snapshot) => {
-                    //     if (snapshot){
-                    //       const data = snapshot.data()
-                          
-                    //       const senders = filterConnectsBySenderId(newarray, data.sender)
-                    //       // senders.push()
-                    //       setNotificationSenders(senders)
-                    //       console.log(senders)
-
-                    //       // updateDoc(notificationRef, {
-                    //       //   notification: '',
-                    //       //   // or use this to mark it as read
-                    //       //   // read: true,
-                    //       // });
-                    //     }
-                    //   })
-                    //   return () => unsubscribe()
-                    // }
+                    
                    })
                 
               }
@@ -474,7 +453,7 @@ const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, c
                 )
               })}
               </div>
-              {((Array.from(notificationSenders))[0] !== undefined) && <span>These have sent notifications. Please check chat arena.</span>}
+              {((Array.from(notificationSenders))[(Array.from(notificationSenders)).length - 1] !== undefined) && <span>These have sent notifications. Please check chat arena.</span>}
             </div>
             }
             <div className='relative '>
@@ -489,7 +468,7 @@ const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, c
                     : <div>
                         {foundUsers && 
                         <ul className='bg-gray-200 rounded-2xl w-full grid p-8 grid-cols-3 shadow-2xl border xsm:max-lg:grid-cols-2 xsm:max-[400px]:grid-cols-1 xsm:max-[400px]:min-w-[280px]'>
-                          <h1 className='font-bold col-span-3 pb-4 xsm:max-lg:col-span-2 auto-cols-fr'>CONNECT AND CHAT</h1>
+                          <h1 className='font-extrabold text-xl col-span-3 pb-4 text-center xsm:max-lg:col-span-2 auto-cols-fr'>CONNECT AND CHAT</h1>
                           {foundUsers.map((user)=>{
                             return(
                               <div className='bg-white flex items-center gap-4 border rounded-2xl shadow-md p-4 flex-col justify-between xsm:max-[670px]:col-span-2 xsm:max-lg:col-span-1 '>
