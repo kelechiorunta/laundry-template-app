@@ -297,7 +297,7 @@ const ChatBox = ({ email }) => {
         timestamp: serverTimestamp(),
       });
       setInput('');
-    //   setSent(!isSent)
+      setSent(authUser.uid)
     }
   };
 

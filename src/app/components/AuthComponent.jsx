@@ -25,7 +25,7 @@ export default function AuthComponent({children}) {
     const [userA, setUserA] = useState('')
     const [active, setA] = useState('')
     const [isloggedOut, setLoggedOut] = useState(false)
-    const [isSent, setSent] = useState(false)
+    const [isSent, setSent] = useState(null)
 
     useEffect(()=>{
     
@@ -101,7 +101,7 @@ export default function AuthComponent({children}) {
       });
     }, [])
 
-    const authO = {authObject: authObject, setAuthObject:setAuthObject, isSent:isSent, setSent:{setSent}, isloggedOut:{isloggedOut}, setLoggedOut:{setLoggedOut}, user:isPendingProfile?user:user, userA: userA, A: active}
+    const authO = {authObject: authObject, setAuthObject:setAuthObject, isSent:isSent, setSent:setSent, isloggedOut:{isloggedOut}, setLoggedOut:{setLoggedOut}, user:isPendingProfile?user:user, userA: userA, A: active}
 
   return (
     // <div>

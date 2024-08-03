@@ -32,7 +32,7 @@ const UserAccount = () => {
 
   const authO = useContext(authContext)
   
-  const { user } = authO
+  const { user, isSent, setSent } = authO
 
   const auth = getAuth(app)
   const [dataFetched, setDataFetched] = useState(false);
@@ -46,6 +46,7 @@ const UserAccount = () => {
   const [isPendingUploadPic, startTransitionUploadPic] = useTransition()
   const [active, setActive] = useState(user && (user?.email).toString())
   const [isPendingLikes, startTransitionLikes] = useTransition()
+  const [isPendingAlert, startTransitionAlert] = useTransition()
 
   const [formData, setFormData] = useState({
     name: '',
@@ -71,6 +72,7 @@ const UserAccount = () => {
   const [connects, setConnects] = useState([])
   const [toggle, setToggle] = useState(null)
   const [notificationSenders, setNotificationSenders] = useState([])
+  const [isAlert, setAlert] = useState(null)
   
     useEffect(()=>{
         
@@ -245,7 +247,7 @@ const UserAccount = () => {
                     setConnects(newarray)
 
                     otherUsers.forEach(async(user)=>{
-                      const chatDocId = [authUser.uid, user.userId].sort().join('_');
+                      const chatDocId = [isSent || authUser.uid, user.userId].sort().join('_');
                       
                       const notificationRef = doc(db, 'notifications', chatDocId)
                       const notificationRefSnapshot = await getDoc(notificationRef)
@@ -258,8 +260,13 @@ const UserAccount = () => {
                             
                             senders = (filterConnectsBySenderId(newarray, data.sender))
                             console.log(senders)
+                            console.log(isSent)
                             
                             setNotificationSenders(senders)
+                            startTransitionAlert(() =>{
+                              setAlert(isSent)
+                            })
+                            
                             console.log(notificationRefSnapshot.data)
     
                             // updateDoc(notificationRef, {
@@ -284,9 +291,9 @@ const UserAccount = () => {
             }
           });
         };
-    
+        console.log(isSent)
         getUsersAndChats();
-      }, [authO, formData]);
+      }, [authO, formData, isSent, chats, isAlert]);
 
   //////
 
@@ -434,7 +441,7 @@ const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, c
             <p className="text-gray-600">{formData.email}</p>
             <p className="text-gray-600">{formData.phone}</p>
             {console.log(connects)}
-            {isPendingLikes? <p>Loading</p>:
+            {isPendingLikes && isPendingAlert? <p>Loading</p>:
             <div className='flex flex-col items-center gap-y-4'>
               <p className='uppercase font-bold'>{`${formData.name} has ${chats && chats} connect${chats<2?'':'s'}`}</p>
               <div className='relative flex items-center '>
