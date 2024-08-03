@@ -11,6 +11,11 @@ import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import Link from 'next/link';
 
 export default function Dashboard() {
+  const [userEmail, setUserEmail ] = useState(null)
+  const [error, setError] = useState('')
+  const [isPending, startTransition] = useTransition()
+  const [isPendingProfileUpdate, startTransitionProfileUpdate] = useTransition()
+  const [isPendingUploadPic, startTransitionUploadPic] = useTransition()
   const authO = useContext(authContext)
   const { user } = authO
 
@@ -26,8 +31,47 @@ export default function Dashboard() {
     comments: '',
     // photoURL: null,
     });
+
   
-    // const [phone, setPhone] = useState(null)
+    useEffect(()=>{
+        
+      const getcurrentUser = () =>{
+        startTransition(async()=>{
+          try{
+            onAuthStateChanged(auth, async(user) => {
+              if (user){
+                setUserEmail(user.email);
+
+                const userRef = doc(db, 'users', user.uid)
+                const userrefsnapshot = await getDoc(userRef)
+                if (userrefsnapshot.exists()){
+                  const data = userrefsnapshot.data()
+                  const {email, displayName, phone, photoURL, address, comments, date, pickuptime } = data
+                  setFormData(prevFormData => ({
+                    ...prevFormData,
+                    email: (email),
+                    name: (displayName),  
+                    phone: (phone),
+                    photo: (photoURL),    
+                    address: (address),    
+                    comments: (comments),    
+                    date: (date),    
+                    pickuptime: (pickuptime),    
+                  }));
+                }
+              }
+               
+            });
+          }
+          catch(err){
+            console.error(err.message, "No current user")
+          }
+          
+        })
+      }
+      getcurrentUser()
+    },[authO])
+
   
 
   const handleProfileUpdate = async (formData) => {
@@ -36,61 +80,46 @@ export default function Dashboard() {
         const authProfile = getAuth(app);
         const authProfileUser = authProfile.currentUser;
         
-        // const { name, email, phone, address, } = formData
         // Update profile in Firebase Authentication
-        await updateProfile(authProfileUser, {
-          displayName: formData && formData.name,
-          phoneNumber: formData && formData.phone,
-          photoURL: formData && `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
-        });
+        if (authProfileUser){
+          await updateProfile(authProfileUser, {
+            displayName: formData && formData.name,
+            phoneNumber: formData && formData.phone,
+            photoURL: formData && `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
+          });
+  
+          // Get the token for the current user
+          const userid = authProfileUser.uid;
+  
+                    // Prepare the data for Firestore
+          const updateData = {
+            displayName: formData && formData.name ,
+            phone: formData && formData.phone || '',
+            address: formData && formData.address || '',
+            date: formData && formData.date || '' ,
+            pickuptime: formData && formData.pickuptime || '' ,
+            comments: formData && formData.comments || '',
+            photoURL: formData && `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
+          }
 
-        // Get the token for the current user
-        const userid = authProfileUser.uid;
+          const userRef = doc(db, 'users', userid);
+          const userRefanapshot = await getDoc(userRef)
 
-                  // Prepare the data for Firestore
-        const updateData = {
-          displayName: formData && formData.name ,
-          phone: formData && formData.phone ,
-          address: formData && formData.address || '',
-          date: formData && formData.date || '' ,
-          pickuptime: formData && formData.pickuptime || '' ,
-          comments: formData && formData.comments || '',
-          photoURL: formData && `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
+          if (userRefanapshot.exists()){
+            await updateDoc(userRef, updateData);
+            console.log(updateData)
+            alert("Updates Successful");
+          }else{
+            await setDoc(userRef, updateData);
+            console.log(updateData)
+            alert("Entries saved for the first time Successful");
+          }
+          
         }
-        const pickupData = {
-          // photoURL: formData && `${formData.photo || photoURL}`,
-          user: formData && formData.name || '' ,
-          email: formData && formData.email || '' ,
-          pickupdate: [formData && formData.date ]|| '' ,
-          pickuptime: [formData && formData.pickuptime] || ''
-        }
-        // Remove undefined values from updateData
-        // Object.keys(updateData).forEach(
-        //   (key) => updateData[key] === undefined && delete updateData[key]
-        // );
-
-
+        
+    
         // Update profile in Firestore
-        const userRef = doc(db, 'users', userid);
-        const taskRef = doc(db, 'pickups', userid);
         
-        const taskRefSnapShot = await getDoc(taskRef)
-
-        await updateDoc(userRef, updateData);
-       
-        if (taskRefSnapShot.exists()){
-          await updateDoc(taskRef, { pickuptime: arrayUnion(pickupData.pickuptime[0]) }) 
-          await updateDoc(taskRef, { pickupdate: arrayUnion(pickupData.pickupdate[0]) });
-        }
-        else{
-          await setDoc(taskRef, pickupData)
-
-        }
-        
-
-        console.log(updateData, pickupData)
-
-        alert("Updates Successful");
       } catch (err) {
         console.error(err.message);
         alert("Unable to Update: Please ensure your details are complete", err.message)
@@ -98,79 +127,53 @@ export default function Dashboard() {
       });
     };
 
-    const [userEmail, setUserEmail ] = useState(null)
-    const [error, setError] = useState('')
-    const [isPending, startTransition] = useTransition()
-    const [isPendingProfileUpdate, startTransitionProfileUpdate] = useTransition()
-    const [isPendingUploadPic, startTransitionUploadPic] = useTransition()
+    
     // const [active, setActive] = useState(user && (user?.email).toString())
 
   
-    useEffect(()=>{
-        
-        const getcurrentUser = () =>{
-          startTransition(async()=>{
-            onAuthStateChanged(auth, (currentUser) => {
-              setUserEmail(currentUser && currentUser.email); 
-            });
-          })
-          // setActive(user && (user?.email).toString())
-          setFormData(prevFormData => ({
-            ...prevFormData,
-            email: (user && user.email),
-            name: (user && user.displayName),  
-            // phone: (user && user.phoneNumber),
-            photo: (user && user.photoURL),
-            
-              
-          }));
-          // setPhotoURL( user && user.photoURL)
-        }
-        getcurrentUser()
-      },[auth, userEmail])
-
+    
       // Trying to extract the phoneNumber from the user's database
 
-      const [loading, setLoading] = useState(true)
+      // const [loading, setLoading] = useState(true)
 
-      useEffect(() => {
-        const getUsers = async () => {
-          startTransition(async () => {
-            try {
-              const authP = getAuth(app);
-              const userP = authP && authP.currentUser;
-              const userPid = userP && userP.uid;
+      // useEffect(() => {
+      //   const getUsers = async () => {
+      //     startTransition(async () => {
+      //       try {
+      //         const authP = getAuth(app);
+      //         const userP = authP && authP.currentUser;
+      //         const userPid = userP && userP.uid;
     
-              if (userPid) {
-                const userRef = doc(db, 'users', userPid);
-                const userRefsnapshot = await getDoc(userRef);
-                if (userRefsnapshot.exists()) {
-                  const userData = userRefsnapshot.data();
-                  const { phone, phoneNumber, address, comments, pickuptime, date, photoURL } = userData;
+      //         if (userPid) {
+      //           const userRef = doc(db, 'users', userPid);
+      //           const userRefsnapshot = await getDoc(userRef);
+      //           if (userRefsnapshot.exists()) {
+      //             const userData = userRefsnapshot.data();
+      //             const { phone, phoneNumber, address, comments, pickuptime, date, photoURL } = userData;
     
-                  setFormData(prevFormData => ({
-                    ...prevFormData,
-                    phone: phone || phoneNumber,
-                    comments: comments,
-                    pickuptime: pickuptime,
-                    date: date,
-                    address: address,
-                    photoURL:photoURL || formData.photo
-                  }));
-                } else {
-                  console.error("No such document!");
-                }
-              }
-            } catch (err) {
-              console.error(err.message);
-            }
-            finally{
-              setLoading(false)
-            }
-          });
-        };
-          getUsers();
-      }, [authO]);
+      //             setFormData(prevFormData => ({
+      //               ...prevFormData,
+      //               phone: phone || phoneNumber,
+      //               comments: comments,
+      //               pickuptime: pickuptime,
+      //               date: date,
+      //               address: address,
+      //               photoURL:photoURL || formData.photo
+      //             }));
+      //           } else {
+      //             console.error("No such document!");
+      //           }
+      //         }
+      //       } catch (err) {
+      //         console.error(err.message);
+      //       }
+      //       // finally{
+      //       //   setLoading(false)
+      //       // }
+      //     });
+      //   };
+      //     getUsers();
+      // }, [authO]);
 
 
       
@@ -207,21 +210,7 @@ export default function Dashboard() {
     console.log(formData);
   };
 
-  // // Prepare the data for Firestore
-  // const updateData = {
-  //   displayName: formData.name,
-  //   phone: formData.phone,
-  //   address: formData.address,
-  //   date: formData.date,
-  //   pickuptime: formData.pickuptime,
-  //   comments: formData.comments,
-  //   photoURL: `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
-  // }
-
-  // // Remove undefined values from updateData
-  // Object.keys(updateData).forEach(
-  //   (key) => updateData[key] === undefined && delete updateData[key]
-  // );
+  
 
   return (
     
@@ -232,9 +221,9 @@ export default function Dashboard() {
         {/* Sidebar Profile Section */}
         <div className="md:w-1/3 p-4 border-r border-gray-200">
           <div className="flex items-center space-x-4 mb-6">
-          {formData.photo===null && (
+          {formData.photo===null? (
         <FaUserCircle size={50} className="text-gray-700 z-10" />
-      ) || (
+      ) : (
         <img
           className='rounded-full shadow-xl overflow-hidden bg-center object-fill w-[50px] h-[50px]'
           src={formData.photo}

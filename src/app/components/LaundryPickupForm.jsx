@@ -20,7 +20,7 @@ const listedwares = [
     { id: 'socks', name: 'Socks', price: 3, icon: <GiSocks />, index:8 },
   ];
 
-export default function LaundryPickupForm(){
+export default function LaundryPickupForm({setSelectedTab}){
   const [selectedWares, setSelectedWares] = useState([]);
   const [username, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -28,6 +28,8 @@ export default function LaundryPickupForm(){
   const [isPending, startTransition] = useTransition()
   const [isPendingSave, startTransitionSave] = useTransition()
   const [isPendingUser, startTransitionUser] = useTransition()
+  const [isPendingPickup, startTransitionPickup] = useTransition()
+  const [pickup, setPickup] = useState([])
   const auth = getAuth(app)
   
 
@@ -105,6 +107,55 @@ export default function LaundryPickupForm(){
     });
   };
 
+  const handlePickup = () => {
+    startTransitionPickup(async()=>{
+      try{
+          const auth = getAuth();
+          const activeUser = auth.currentUser;
+          if (!activeUser) {
+            throw new Error("No active user");
+          }
+          const activeUserId = activeUser.uid;
+          const docRef = doc(db, 'wares', activeUserId);
+          const docRefSnapshot = await getDoc(docRef);
+
+
+          if (selectedWares){
+            
+            const addedPickup = [...pickup, selectedWares]
+            setPickup(addedPickup)
+            // const newlist = selectedWares.map(item=>({
+            //   id: item.id,
+            //   name: item.name,
+            //   price: item.price
+            // }))
+            if (docRefSnapshot.exists()){
+              await updateDoc(docRef, {
+                pickup: addedPickup.map(i=>({
+                  index: i
+                }))
+              }, {merge: true})
+            }else{
+              await setDoc(docRef, {
+                pickup: addedPickup.map(i=>({
+                  index: i
+                }))
+              }, {merge: true})
+            }
+            
+          }
+
+
+        
+        setSelectedTab('pickups')
+      }
+      catch(err){
+        console.error(err.message, "Unable to Schedule Pickups")
+      }
+      
+    })
+  }
+
   const handleSave = () => {
     startTransitionSave(async()=>{
       try {
@@ -130,12 +181,6 @@ export default function LaundryPickupForm(){
 
         
           if (docRefSnapshot.exists()) {
-          
-            // await setDoc(docRef, {
-            //   wares: waresArray,
-            //   name: username || "", // Ensures username is handled properly
-            //   email: email || ""    // Ensures email is handled properly
-            // });
             await updateDoc(docRef, {
               wares: waresArray,//arrayUnion(...waresArray),
               name: username || "", // Ensure username is handled properly
@@ -166,6 +211,20 @@ export default function LaundryPickupForm(){
   };
 
   return (
+      <>
+    {isPendingPickup ? (
+      <div className="animate-pulse">
+        <div className="flex items-center space-x-4 mb-4">
+          <Skeleton circle={true} height={50} width={50} />
+          <div>
+            <Skeleton width={120} />
+            <Skeleton width={180} />
+          </div>
+        </div>
+        <Skeleton count={3} />
+      </div>
+    ) : 
+      
     <div className="max-w-2xl mx-auto p-6 bg-white rounded-lg shadow-md">
       <h1 className="text-3xl font-bold mb-6 text-center">Laundry Pickup Form</h1>
       <form onSubmit={handleSubmit}>
@@ -280,16 +339,21 @@ export default function LaundryPickupForm(){
                 {isPendingSave? <FaSpinner className='animate-spin mx-auto'/> : 'Save' }
             </button>
             <button
+                onClick={handlePickup}
                 type="submit"
                 className="w-full py-3 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition duration-200"
             >
                 Schedule Pickup
             </button>
         </div>
-        
       </form>
     </div>
+          
+        
+        }
+    </>  
   );
+
 };
 
 // export default LaundryPickupForm;

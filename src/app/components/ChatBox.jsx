@@ -124,13 +124,14 @@
 
 // export default ChatBox;
 'use client'
-import { useEffect, useState, useTransition, useRef } from 'react';
+import { useEffect, useState, useTransition, useRef, useContext } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
 import { collection, getDocs, query, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 // import { db } from './firebase'; // Adjust the path to your Firebase configuration
 import { app, db } from '../firebase/firebaseConfig';
 import { FaPaperPlane } from 'react-icons/fa';
 import Skeleton from 'react-loading-skeleton';
+import { authContext } from './AuthComponent';
 
 const ChatBox = ({ email }) => {
   const [authUser, setAuthUser] = useState(null);
@@ -140,6 +141,9 @@ const ChatBox = ({ email }) => {
   const [chatId, setChatId] = useState(null);
   const [isPending, startTransition] = useTransition()
   const [notification, setNotification] = useState('')
+  const authC = useContext(authContext)
+
+  const { isSent, setSent }  = authC
 
   const authChat = getAuth(app)
   
@@ -293,6 +297,7 @@ const ChatBox = ({ email }) => {
         timestamp: serverTimestamp(),
       });
       setInput('');
+    //   setSent(!isSent)
     }
   };
 

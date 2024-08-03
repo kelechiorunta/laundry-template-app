@@ -9,11 +9,13 @@ import { closeSession } from "../server actions/server actions";
 import { FaUserTag, FaTimes} from "react-icons/fa";
 import { useState, useEffect } from "react";
 import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
+import { doc, getDoc} from "firebase/firestore";
+
 // import { auth } from "../firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
 import { FaSpinner } from "react-icons/fa";
 import { useTransition, useContext } from "react";
-import { app } from "../firebase/firebaseConfig";
+import { app, db } from "../firebase/firebaseConfig";
 import { authContext } from "./AuthComponent";
 import { usePathname } from "next/navigation";
 import logo from '../../../public/imgs/logo_laundry.png'
@@ -29,7 +31,8 @@ export default function LaundryHeader() {
   const auth = getAuth(app)
 
   const [isauth, setAuth] = useState(null)
-  const [userm, setUser] = useState(user)
+  const [user_active, setUser] = useState(user)
+  const [user_photo, setUserphoto] = useState(null)
   const [isPending, startTransition] = useTransition()
   const [isPendingProfile, startTransitionProfile] = useTransition()
   const [isPendingAuth, startTransitionAuth] = useTransition()
@@ -47,45 +50,38 @@ export default function LaundryHeader() {
   // });
   // })
 
+  // const auth = getAuth(app)
+
   const router = useRouter()
-
-  // useEffect(()=>{
-  //   const getActiveAuth = async() => {
-  //   //  startTransitionAuth(async()=>{
-  //     const activeauth = await authUserEmail()
-  //     setAuth(activeauth)
-  //   //  }) 
-  //   }
-  //   const timerId = setTimeout(getActiveAuth, 5000)
-
-  //   return() => {
-  //     clearTimeout(timerId)
-  //   }
-  // },[isauth, auth, userA]) // i removed isauth from the dependency for performance issues
-
-  useEffect(() => {
-      const authheader = getAuth(app)
-      setUser(user)
-      // const authheaderC = authheader.currentUser
-      onAuthStateChanged(authheader, (currentUser) => {
-        setAuth(currentUser)
-       
-      })
-      // console.log(userA, user)
-  }, [isauth, auth, userA])
 
   useEffect(()=>{
     
     const getcurrentUser = () =>{
       startTransitionProfile(async()=>{
-        onAuthStateChanged(auth, (currentUser) => {
-          setUser(currentUser); 
-        });
+        
+          try{
+            onAuthStateChanged(auth, async(currentUser) => {
+              setAuth(currentUser)
+              if (currentUser){
+                const id = currentUser.uid
+                const userRef = doc(db, 'users', id)
+                const userRefsnapshot = await getDoc(userRef)
+                if (userRefsnapshot.exists()){
+                  const userdata = userRefsnapshot.data()
+                  const { photoURL } = userdata
+                  setUserphoto(photoURL)
+                }
+              }
+            })
+          }
+          catch(err){
+            console.error(err.message)
+          }
       })
       
     }
     getcurrentUser()
-  },[auth])
+  },[])
 
   const clearCookies = () => {
     document.cookie.split(";").forEach((c) => {
@@ -230,7 +226,7 @@ export default function LaundryHeader() {
                         </div>}
                           
                         <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
-                            {!(userA)? <FaUserTag className="mt-6 rounded-full border shadow-lg" size={50}/>:
+                            {!(userA )? <FaUserTag className="mt-6 rounded-full border shadow-lg" size={50}/>:
                             
                             <button
                             onClick={handleToggle}
@@ -245,7 +241,7 @@ export default function LaundryHeader() {
                               {/* {console.log(userA && userA)} */}
                               {isPendingProfile? <FaSpinner className="animate-spin mx-auto fill-white w-[100%] h-[50px]"/>: //: `${user === null? "" : user && (user?.email) && (user?.email)[0].toUpperCase()}`}
                               <div className={` flex items-center justify-center text-center border top-0 border-white rounded-2xl black bg-[#082f49] text-white`}>
-                                  {!toggle ? <img src={user && user.photoURL} className="absolute w-[50px] h-[50px] overflow-hidden rounded-full" width={50} height={50} alt="pic"/>
+                                  {!toggle ? <img src={user_photo} className="absolute w-[50px] h-[50px] overflow-hidden rounded-full" width={50} height={50} alt="pic"/>
                                   :
                                   <p className="rounded-full px-5 py-3 absolute text-xl overflow-hidden bg-[#082f49]">{user && (user?.email) && (user?.email)[0].toUpperCase()}</p>
                                   // :<p

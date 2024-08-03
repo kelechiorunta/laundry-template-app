@@ -1,5 +1,5 @@
 'use client'
-import React, { useState } from 'react';
+import React, { startTransition, useState } from 'react';
 import { FaUser, FaTruck, FaTshirt, FaSpinner, FaRegistered, FaUserEdit, FaConnectdevelop, FaEnvelopeOpenText, FaShoppingBasket } from 'react-icons/fa';
 import { useEffect, useTransition, useContext } from 'react';
 import { getAuth, onAuthStateChanged, updatePhoneNumber, updateProfile } from 'firebase/auth';
@@ -78,18 +78,20 @@ const UserAccount = () => {
           startTransition(async()=>{
             onAuthStateChanged(auth, (currentUser) => {
               setUserEmail(currentUser && currentUser.email); 
+
+              setFormData(prevFormData => ({
+                ...prevFormData,
+                email: (currentUser && currentUser.email),
+                name: (currentUser && currentUser.displayName),  
+                phone: (currentUser && currentUser.phoneNumber),
+                photo: (currentUser && currentUser.photoURL),
+                
+                  
+              }));
             });
           })
           setActive(user && (user?.email).toString())
-          setFormData(prevFormData => ({
-            ...prevFormData,
-            email: (user && user.email),
-            name: (user && user.displayName),  
-            phone: (user && user.phoneNumber),
-            photo: (user && user.photoURL),
-            
-              
-          }));
+          
           // setPhotoURL( user && user.photoURL)
         }
         getcurrentUser()
@@ -119,7 +121,7 @@ const UserAccount = () => {
                     pickuptime: pickuptime,
                     date: date,
                     address: address,
-                    photoURL:photoURL || formData.photo
+                    photo:photoURL || formData.photo
                   }));
                 } else {
                   console.error("No such document!");
@@ -290,7 +292,7 @@ const UserAccount = () => {
 
 
 
-  const renderContent = ({allMessages, user, chats, mergedIds, isPendingLikes}) => {
+  const renderContent = ({allMessages, user, chats, mergedIds, isPendingLikes, formData}) => {
     switch (selectedTab) {
       case 'profile':
         return <div><Profile notificationSenders={notificationSenders} setToggle={setToggle} toggle={toggle} connects={connects} allMessages={allMessages} isPendingLikes={isPendingLikes} mergedIds={mergedIds} chats={chats} pendingUsers={pendingUsers} foundUsers={foundUsers} isProfileActive={selectedTab === 'profile'} pickupData={pickupData} setPickupData={setPickupData} user={user} dataFetched={dataFetched} setDataFetched={setDataFetched} startTransition={startTransition} formData={formData} setFormData={setFormData} isPending={isPending} authO={authO} /></div>;
@@ -299,7 +301,7 @@ const UserAccount = () => {
       case 'update':
         return <Dashboard user={user} formData={formData}/>;//<Pickups user={user} formData={formData} />;
       case 'wares':
-        return <LaundryPickupForm wares={wares}/>
+        return <LaundryPickupForm wares={wares} setSelectedTab={setSelectedTab}/>
         // return <LaundryPickupForm/>;
       case 'registerWares':
         return <RegisterWares formData={formData} setFormData={setFormData} isPending={isPending}/>;
@@ -348,7 +350,7 @@ const UserAccount = () => {
         </nav>
       </aside>
       <main className="flex-1 p-8 bg-gray-100">
-        {renderContent({user, chats, mergedIds, isPendingLikes, connects, toggle, setToggle})}
+        {renderContent({user, chats, mergedIds, isPendingLikes, connects, toggle, setToggle, formData})}
       </main>
     </div>
   );
@@ -547,12 +549,47 @@ const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, c
 
 
 const Pickups = ({user, formData}) => {
+  const [data, setData] = useState(null)
+  const [isPendingData, startTransitionData] = useTransition()
+  const auth = getAuth(app)
+  useEffect(() => {
+    const getPickups = () => {
+      startTransitionData(async()=>{
+          try{
+            const currentU = auth.currentUser
+            const user_id = currentU.uid
+            const ref = doc(db, 'wares', user_id)
+            const refSnapshot = await getDoc(ref)
+            if (refSnapshot.exists()){
+              const data = refSnapshot.data()
+              const {pickup} = data
+              setData(pickup)
+              // setData(pickup.map((i,index)=>({i})))
+
+            }
+          }
+          catch(err){
+            console.error(err.message)
+          }
+      })
+    }
+    getPickups()
+  }, [auth])
   return (
     <div id='pickups'>
       <h2 className="text-2xl font-bold mb-4">Pickups</h2>
-      <p>Pickups content goes here...</p>
+      {isPendingData?<FaSpinner className='animate-spin mx-auto text-white'/>:<p>Pickups content goes here...</p>}
       {/* TODO list for pickups */}
-      <ul>
+      <ul className='flex flex-col'>
+        <li className='flex gap-4'>
+          {data && data[0].index.map(i=>{
+          return <div className='flex flex-col'>
+                  <li>{i && i.id.toUpperCase()}</li>
+                  <li>{i && i.price}</li>
+                  </div>})
+                  }
+        </li>
+        {console.log(data && data[0].index[0].price)}
         <li>Completed Pickup 1</li>
         <li>Completed Pickup 2</li>
         <li>Incompleted Pickup 1</li>
