@@ -102,7 +102,6 @@ export default function LaundryPickupForm({setSelectedTab}){
                 newWares.splice(index, 1);
                 return newWares;
             }
-            
         } 
     });
   };

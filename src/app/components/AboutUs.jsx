@@ -15,70 +15,70 @@ export default function AboutUs() {
 
 //   const imageRef = useRef(null)
 
-  useEffect(() => {
-    const element = triggerServiceRef.current;
+  // useEffect(() => {
+  //   const element = triggerServiceRef.current;
 
-    const tl = gsap.timeline({
-      scrollTrigger: {
-        trigger: element,
-        start: 'top', // When the top of the trigger hits the bottom of the viewport
-        end: 'bottom top', // When the bottom of the trigger hits the top of the viewport
-        scrub: 3,
-         pin: true,
-      },
-    });
+  //   const tl = gsap.timeline({
+  //     scrollTrigger: {
+  //       trigger: element,
+  //       start: 'top', // When the top of the trigger hits the bottom of the viewport
+  //       end: 'bottom', // When the bottom of the trigger hits the top of the viewport
+  //       scrub: 3,
+  //        pin: true,
+  //     },
+  //   });
 
-    tl.fromTo(
-      element,
-      { backgroundPositionY: '0%', },
-      { backgroundPositionY: '100%', transition:'backgroundPositionY 2s ease', duration: 3 }
-    );
+  //   tl.fromTo(
+  //     element,
+  //     { backgroundPositionY: '0%', },
+  //     { backgroundPositionY: '100%', transition:'backgroundPositionY 2s ease', duration: 3 }
+  //   );
 
-    return () => {
-      // Cleanup ScrollTrigger instance on component unmount
-      ScrollTrigger.getAll().forEach(instance => instance.kill());
-      tl.kill();
-    };
-  }, []);
+  //   return () => {
+  //     // Cleanup ScrollTrigger instance on component unmount
+  //     ScrollTrigger.getAll().forEach(instance => instance.kill());
+  //     tl.kill();
+  //   };
+  // }, []);
 
-  useEffect(() => {
-    const elements = childRefs.current;
+  // useEffect(() => {
+  //   const elements = childRefs.current;
 
 
-    elements.forEach((element, index) => {
-      ScrollTrigger.create({
-        trigger: triggerServiceRef.current,
-        start: 'top 150px',
-        end: 'bottom',
-        onEnter: () => {
-         gsap.fromTo(element, {
-            x: -200, // Final position
-            opacity: 0, // Final opacity
-            duration: 2,
-            delay: index * 0.2, // Stagger the animations
-            stagger: 2
-          }, {
-            x: 0, // Final position
-            opacity: 1, // Final opacity
-            duration: 2,
-            delay: index * 0.2, // Stagger the animations
-            stagger: 2
-          }, );
-        },
-        onLeaveBack: () => {
-          gsap.to(element, {
-            x: -200, // Initial position
-            opacity: 0, // Initial opacity
-            duration: 1,
-            delay: index * 0.5,
-            stagger:0.5,
-          });
-        },
-        scrub: true,
-      });
-    });
+  //   elements.forEach((element, index) => {
+  //     ScrollTrigger.create({
+  //       trigger: triggerServiceRef.current,
+  //       start: 'top',
+  //       end: 'bottom',
+  //       onEnter: () => {
+  //        gsap.fromTo(element, {
+  //           x: 0, // Final position
+  //           opacity: 1, // Final opacity
+  //           duration: 2,
+  //           delay: index * 0.2, // Stagger the animations
+  //           stagger: 2
+  //         }, {
+  //           x: 0, // Final position
+  //           opacity: 1, // Final opacity
+  //           duration: 2,
+  //           delay: index * 0.2, // Stagger the animations
+  //           stagger: 2
+  //         }, );
+  //       },
+  //       onLeaveBack: () => {
+  //         gsap.to(element, {
+  //           //x: -200, // Initial position
+  //           opacity: 1, // Initial opacity
+  //           duration: 1,
+  //           delay: index * 0.5,
+  //           stagger:0.5,
+  //         });
+  //       },
+  //       scrub: true,
+  //     });
+  //   });
 
-  }, []);
+  // }, []);
 
   return (
     <div ref={triggerServiceRef} className="landing w-full overflow-hidden box-border flex relative flex-col shrink-0 px-10 pt-10 pb-80 h-full bg-black bg-center bg-no-repeat bg-cover bg-[url('../../public/imgs/laundry_selection.jpg')]">

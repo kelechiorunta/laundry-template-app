@@ -21,8 +21,8 @@ export default function LandingSection() {
     const tl = gsap.timeline({
       scrollTrigger: {
         trigger: element,
-        start: 'bottom 50%', // When the top of the trigger hits the bottom of the viewport
-        end: 'bottom top', // When the bottom of the trigger hits the top of the viewport
+        start: 'top', // When the top of the trigger hits the bottom of the viewport
+        end: 'middle', // When the bottom of the trigger hits the top of the viewport
         scrub: 3,
          pin: true,
       },
@@ -48,12 +48,12 @@ export default function LandingSection() {
     elements.forEach((element, index) => {
       ScrollTrigger.create({
         trigger: triggerRef.current,
-        start: 'top 150px',
-        end: 'bottom',
+        start: 'top ',
+        end: 'middle',
         onEnter: () => {
          gsap.fromTo(element, {
-            x: -200, // Final position
-            opacity: 0, // Final opacity
+            x: 0, // Final position
+            opacity: 1, // Final opacity
             duration: 2,
             delay: index * 0.2, // Stagger the animations
             stagger: 2
@@ -67,7 +67,7 @@ export default function LandingSection() {
         },
         onLeaveBack: () => {
           gsap.to(element, {
-            x: -200, // Initial position
+            x: 0, // Initial position
             opacity: 0, // Initial opacity
             duration: 1,
             delay: index * 0.5,
@@ -81,7 +81,7 @@ export default function LandingSection() {
   }, []);
 
   return (
-    <div ref={triggerRef} className="landing w-full overflow-hidden box-border flex relative flex-col shrink-0 px-10 pt-10 pb-80 h-full bg-center bg-no-repeat bg-cover bg-[url(https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2F15aeefa5519d4479a5fe32be42580f8a)]">
+    <div ref={triggerRef} className="landing w-full overflow-hidden box-border flex relative flex-col shrink-0 px-10 pt-10 pb-80 h-full bg-center bg-no-repeat bg-cover bg-[url(https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2F15aeefa5519d4479a5fe32be42580f8a)] xsm:max-2xl:max-w-full">
       <div className="flex gap-5 max-md:flex-col max-md:gap-0">
         <div className="z-20 flex flex-col w-full max-md:ml-0 max-md:w-full">
           <div className="box-border flex relative flex-col shrink-0 mt-48 mb-0">

@@ -126,7 +126,7 @@
 'use client'
 import { useEffect, useState, useTransition, useRef, useContext } from 'react';
 import { getAuth, onAuthStateChanged } from 'firebase/auth';
-import { collection, getDocs, query, orderBy, onSnapshot, addDoc, serverTimestamp, getDoc, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
+import { collection, getDocs, query, orderBy, onSnapshot, addDoc, where, serverTimestamp, getDoc, doc, setDoc, updateDoc, arrayUnion } from 'firebase/firestore';
 // import { db } from './firebase'; // Adjust the path to your Firebase configuration
 import { app, db } from '../firebase/firebaseConfig';
 import { FaPaperPlane } from 'react-icons/fa';
@@ -165,7 +165,7 @@ const ChatBox = ({ email }) => {
     const getChats = () => {
         startTransition(async()=>{
             try{
-                const auth = getAuth();
+                const auth = getAuth(app);
         onAuthStateChanged(auth, async (user) => {
           if (user) {
             setAuthUser(user);
@@ -173,9 +173,10 @@ const ChatBox = ({ email }) => {
             const allUsersSnapshot = await getDocs(collection(db, 'users'));
             const users = allUsersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
-            const recipient = users.find(u => u.email === decodeURIComponent(email));
+            const recipient = users.find(u => {return u.email === decodeURIComponent(email)});
             if (recipient) {
               setRecipientUser(recipient);
+              console.log(recipient)
     
               const chatDocId = [user.uid, recipient.id].sort().join('_');
               setChatId(chatDocId);
@@ -188,8 +189,13 @@ const ChatBox = ({ email }) => {
               console.log(recipientUser)
               console.log(authUser)
     
-              const unsubscribe = onSnapshot(messagesQuery, (snapshot) => {
-                setMessages(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+              const unsubscribe = onSnapshot(messagesQuery, async(snapshot) => {
+                if (snapshot){
+                    setMessages(snapshot.docs.map((doc) => ({ ...doc.data(), id: doc.id })));
+                }else{
+                    await addDoc(doc(db, 'notifications', chatDocId))
+                }
+                
               });
     
               return () => unsubscribe();
@@ -208,51 +214,109 @@ const ChatBox = ({ email }) => {
     
   }, [email, authChat, chatId, authUser]);
 
+  /////////////////////////////////
+
   useEffect(() => {
-    const getNotification = () => {
-      startTransition(async () => {
-        try {
-          const auth = getAuth(app);
-          const authuser = auth.currentUser;
-          const authuserId = authuser.uid;
-          const notificationRef = doc(db, 'notifications', authuserId);
-          const notificationSnapshot = await getDoc(notificationRef);
+    const mergeIds = () => {
+        startTransition(async()=>{
+            try{
+                const auth = getAuth(app);
+        onAuthStateChanged(auth, async (user) => {
+          if (user) {
+            setAuthUser(user);
+            
+            const allUsersSnapshot = await getDocs(collection(db, 'users'));
+            const users = allUsersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            const recipient = users.find(u => {return u.email === decodeURIComponent(email)});
+            if (recipient) {
+              setRecipientUser(recipient);
+    
+              const chatDocId = [user.uid, recipient.userId].sort().join('_');
+              setChatId(chatDocId);
+              console.log(chatDocId)
+    
+              const noteRef = doc(db, 'notifications', chatDocId)
 
-          if (notificationSnapshot.exists()) {
-            const data = notificationSnapshot.data();
-
-            data.sender.forEach((d) => {
-                if (recipientUser.userId == d) {
-                    const unsubscribe = onSnapshot(notificationRef, (snapshot) => {
-                      const notificationData = snapshot.data();
-                      if (d == recipientUser.userId && notificationData.notification && notificationData.time) {
-                        setNotification(notificationData.notification + notificationData.time);
-                        alert(notificationData.notification + ' at ' + notificationData.time);
-      
-                       // // Clear the notification after rendering it
-                      //   updateDoc(notificationRef, {
-                      //     notification: '',
-                      //     // or use this to mark it as read
-                      //     // read: true,
-                      //   });
-                      }
-                    });
-      
-                    return () => {
-                      unsubscribe();
-                    };
-                  }
-            })
-           
+              console.log(recipientUser)
+              console.log(authUser)
+              console.log(noteRef)
+    
+              const unsubscribe = onSnapshot(noteRef, async(snapshot) => {
+                if (snapshot){
+                    await updateDoc(doc(db, 'notifications', chatDocId), {
+                        isRead: true
+                    })
+                }else{
+                    return
+                    // await addDoc(doc(db, 'notifications', chatDocId), {
+                    //     message: "Hello"
+                    // })
+                }
+                
+              });
+    
+              return () => unsubscribe();
+            }
           }
-        } catch (err) {
-          console.error(err.message, "No new notification");
-        }
-      });
-    };
+        });
+            }
+            catch(err){
+                console.error('Could not merge Ids')
+            }
+        })
+    
+    }
 
-    getNotification();
-  }, [authChat, chatId, email]);
+    mergeIds()
+    
+  }, [chatId, email]);
+
+//   useEffect(() => {
+//     const getNotification = () => {
+//       startTransition(async () => {
+//         try {
+//           const auth = getAuth(app);
+//           const authuser = auth.currentUser;
+//           const authuserId = authuser.uid;
+//           const notificationRef = doc(db, 'notifications', authuserId);
+//           const notificationSnapshot = await getDoc(notificationRef);
+
+//           if (notificationSnapshot.exists()) {
+//             const data = notificationSnapshot.data();
+
+//             data.sender.forEach((d) => {
+//                 if (recipientUser.userId == d) {
+//                     const unsubscribe = onSnapshot(notificationRef, (snapshot) => {
+//                       const notificationData = snapshot.data();
+//                       if (d == recipientUser.userId && notificationData.notification && notificationData.time) {
+//                         setNotification(notificationData.notification + notificationData.time);
+//                         alert(notificationData.notification + ' at ' + notificationData.time);
+      
+//                        // // Clear the notification after rendering it
+//                       //   updateDoc(notificationRef, {
+//                       //     notification: '',
+//                       //     // or use this to mark it as read
+//                       //     // read: true,
+//                       //   });
+//                       }
+//                     });
+      
+//                     return () => {
+//                       unsubscribe();
+//                     };
+//                   }
+//             })
+           
+//           }
+//         } catch (err) {
+//           console.error(err.message, "No new notification");
+//         }
+//       });
+//     };
+
+//     getNotification();
+//   }, [authChat, chatId, email]);
 
   const sendMessage = async (e) => {
     e.preventDefault();
@@ -290,19 +354,36 @@ const ChatBox = ({ email }) => {
                 id:chatId,
               });
         }
-        
+        const messageRef = collection(db, 'chats', chatId, 'messages')
+        const q = query(messageRef, where("recipientId", "==", authUser.uid))
+
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            querySnapshot.docChanges().forEach((change) => {
+                if (change.type === 'added') {
+                    console.log('New message:', change.doc.data());
+                    // alert('Changes made')
+                    // Handle the new message notification here
+                  }
+            })
+        })
       await addDoc(collection(db, 'chats', chatId, 'messages'), {
         text: input,
         senderId: authUser.uid,
+        recipientId: recipientUser.userId,
+        isRead: false,
         timestamp: serverTimestamp(),
       });
       setInput('');
-      setSent(authUser.uid)
+      setSent(recipientUser.userId)
+    //   console.log(isSent)
+
+    return () => unsubscribe()
     }
   };
 
   return (
         <div className="flex flex-col h-screen p-4 bg-gray-100">
+            {console.log(isSent && isSent)}
             <h1 className='font-extrabold py-4 '>{authUser && authUser.displayName.toUpperCase()} is ready to chat and connect with {recipientUser && recipientUser.displayName.toUpperCase()}</h1>
           <div className="flex flex-col flex-grow p-4 bg-white shadow-lg rounded-lg overflow-hidden">
           {isPending ? (
@@ -325,6 +406,7 @@ const ChatBox = ({ email }) => {
               className={`flex ${msg.senderId === authUser.uid ? 'justify-end' : 'justify-start'} mb-2  border-y-gray-400 border-x-0 py-4`}
             >
               <div className="p-2 rounded-lg shadow-lg">
+                {console.log(recipientUser)}
               {msg.senderId === authUser.uid ? <div><img src={authUser.photoURL} width={50} height={50} className='w-[50px] h-[50px] rounded-full' alt='S'/> {authUser.displayName}</div>
               :  <div><img src={recipientUser.photoURL} width={50} height={50} className='w-[50px] h-[50px] rounded-full' alt='R'/> {recipientUser.displayName}</div>}
 

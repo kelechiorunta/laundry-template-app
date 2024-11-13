@@ -1,12 +1,14 @@
 'use client'
 import Image from 'next/image'
 import Link from 'next/link'
-import React from 'react'
+import React, { useEffect } from 'react'
 // import logo from '../../../public/imgs/logo.png'
 import logo from '../../../public/imgs/logo.png'
 import { FaHamburger } from 'react-icons/fa'
+// import { useSession } from 'next-auth/react'
 
 export default function MainHeader() {
+
   return (
     <div className='w-full flex items-center gap-x-4 p-8 sticky top-0 z-20 justify-between bg-white text-white border xs:max-sm:p-4'>
         <Image src={logo} alt='logo' width={100} height={100}/>

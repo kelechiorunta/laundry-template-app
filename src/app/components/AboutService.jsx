@@ -148,8 +148,8 @@ export default function DiscoverService() {
       // elements.forEach((element, index) => {
         ScrollTrigger.create({
           trigger: my_container.current,
-          start: 'top 550px',
-          end: 'bottom',
+          start: 'top',
+          end: 'middle',
           onEnter: () => {
             gsap.to('.main_container', {
               x: 0, // Final position
@@ -161,8 +161,8 @@ export default function DiscoverService() {
           },
           onLeaveBack: () => {
             gsap.to('.main_container', {
-              x: -200, // Initial position
-              opacity: 0, // Initial opacity
+              x: 0, // Initial position
+              opacity: 1, // Initial opacity
               duration: 2,
               // delay: index * 0.5,
               stagger:0.5,

@@ -1,9 +1,9 @@
 'use client'
-import React, { startTransition, useState } from 'react';
+import React, { useTransition, useState } from 'react';
 import { FaUser, FaTruck, FaTshirt, FaSpinner, FaRegistered, FaUserEdit, FaConnectdevelop, FaEnvelopeOpenText, FaShoppingBasket } from 'react-icons/fa';
-import { useEffect, useTransition, useContext } from 'react';
-import { getAuth, onAuthStateChanged, updatePhoneNumber, updateProfile } from 'firebase/auth';
-import { updateDoc, doc, collection, getDoc, getDocs, onSnapshot } from 'firebase/firestore';
+import { useEffect, useContext } from 'react';
+import { getAuth, onAuthStateChanged, updatePhoneNumber, updateProfile, GoogleAuthProvider, signInWithCredential } from 'firebase/auth';
+import { updateDoc, addDoc, doc, collection, getDoc, getDocs, onSnapshot, query, where, serverTimestamp } from 'firebase/firestore';
 import { app, db } from '../firebase/firebaseConfig';
 import { authContext } from './AuthComponent';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
@@ -16,10 +16,13 @@ import Pickup from './Pickup';
 import { FaPants, FaHat, FaPlus, FaMinus } from 'react-icons/fa';
 // import LaundryPickupForm from './LaundryPickupForm';
 import LaundryPickupForm from './LaundryPickupForm';
+import { useRouter } from 'next/navigation';
+import { useSession } from 'next-auth/react';
 // import 'tailwindcss/tailwind.css';
 
-const UserAccount = () => {
+const UserAccount = ({isSent, setSent}) => {
   const [selectedTab, setSelectedTab] = useState('profile');
+  const router = useRouter()
 
   const wares = [
     { id: 'shirt', name: 'Shirt', price: 5, icon: <FaTshirt /> },
@@ -32,7 +35,7 @@ const UserAccount = () => {
 
   const authO = useContext(authContext)
   
-  const { user, isSent, setSent } = authO
+  const { user} = authO
 
   const auth = getAuth(app)
   const [dataFetched, setDataFetched] = useState(false);
@@ -72,20 +75,27 @@ const UserAccount = () => {
   const [connects, setConnects] = useState([])
   const [toggle, setToggle] = useState(null)
   const [notificationSenders, setNotificationSenders] = useState([])
-  const [isAlert, setAlert] = useState(null)
+  const [isAlert, setAlert] = useState([])
+  const [myfriends, setFriends] = useState(null)
+  const { data: session, status } = useSession()
+  const [userData, setUserData] = useState(null);
+  const [loading, setLoading] = useState(false)
+
   
     useEffect(()=>{
         
-        const getcurrentUser = () =>{
+        const getcurrentUser = async() =>{
+
           startTransition(async()=>{
             onAuthStateChanged(auth, (currentUser) => {
-              setUserEmail(currentUser && currentUser.email); 
-
+              setUserEmail(currentUser && currentUser.email);
+              console.log(currentUser) 
+            
               setFormData(prevFormData => ({
                 ...prevFormData,
-                email: (currentUser && currentUser.email),
+                email: (currentUser && currentUser.email) ,
                 name: (currentUser && currentUser.displayName),  
-                phone: (currentUser && currentUser.phoneNumber),
+                phone: (currentUser && currentUser.phoneNumber) ,
                 photo: (currentUser && currentUser.photoURL),
                 
                   
@@ -97,7 +107,7 @@ const UserAccount = () => {
           // setPhotoURL( user && user.photoURL)
         }
         getcurrentUser()
-      },[auth, userEmail])
+      },[auth])
 
       // Trying to extract the phoneNumber from the user's database
 
@@ -113,17 +123,18 @@ const UserAccount = () => {
                 const userRef = doc(db, 'users', userPid);
                 const userRefsnapshot = await getDoc(userRef);
                 if (userRefsnapshot.exists()) {
-                  const userData = userRefsnapshot.data();
-                  const { phone, phoneNumber, address, comments, pickuptime, date, photoURL } = userData;
+                  const userDatas = userRefsnapshot.data();
+                  const { phone, phoneNumber, address, comments, pickuptime, date, photoURL, email } = userDatas;
     
                   setFormData(prevFormData => ({
                     ...prevFormData,
-                    phone: phone || phoneNumber,
-                    comments: comments,
-                    pickuptime: pickuptime,
-                    date: date,
-                    address: address,
-                    photo:photoURL || formData.photo
+                    email: email ,
+                    phone: phone || phoneNumber ,
+                    comments: comments ,
+                    pickuptime: pickuptime ,
+                    date: date ,
+                    address: address ,
+                    photo:photoURL || formData.photo 
                   }));
                 } else {
                   console.error("No such document!");
@@ -135,7 +146,7 @@ const UserAccount = () => {
           });
         };
         getUsers();
-      }, [authO]);
+      }, [authO,]);
 
       
       ////////////////////////////// FOR GETTING THE PICKUPS
@@ -147,6 +158,10 @@ const UserAccount = () => {
               const authP = getAuth(app);
               const userP = authP && authP.currentUser;
               const userPid = userP && userP.uid;
+
+              // startTransitionAlert(() =>{
+              //   setAlert(isSent)
+              // })
     
               if (userPid) {
                 //  const userRef = doc(db, 'users', userPid);
@@ -175,7 +190,11 @@ const UserAccount = () => {
 
 
       function getUsersById(users, text) {
-        return users.filter(user => {return text.includes(user.userId)});
+        return users.filter(user => {return text.toString().includes(user.userId)});
+      }
+
+      function getConnectsById(users, text) {
+        return users.filter(user => {return text.toString() == (user.userId)});
       }
       const foundfriends = new Set()
       function filterConnectsBySenderId(friends, id){
@@ -186,23 +205,38 @@ const UserAccount = () => {
         return foundfriends
       }
 
-      ///////
+      function getIdsByUserId(arr,user_id){
+        const new_array = arr && arr.filter((item)=>{return item.toString().includes(user_id.toString())})
+        return new_array
+      }
+
+      const newuserarray = []
+      function getFriendsByIds(arr1, arr2){
+        arr1.forEach(item=>{
+          const users = arr2.filter((user)=>{return item.toString().includes(user.userId)})
+          newuserarray.push(users)
+        })
+        return newuserarray
+      }
+
      
       useEffect(() => {
         const getUsersAndChats = () => {
-          startTransition(async () => {
+          startTransition(async() => {
             try {
               const auth = getAuth(app);
               const authUser = auth.currentUser;
               const authUserToken = await authUser?.getIdToken();
+              
     
-              if (authUserToken) {
+              if (authUser) {
+                console.log((session && status=='authenticated') && session.idToken)
                 const usersRef = collection(db, 'users');
                 const chatsRef = collection(db, 'allchats');
-
+  
                 // const notificationRef = doc(db, 'notifications', authUser.uid)
                 // const notificationRefSnapshot = await getDoc(notificationRef)
-
+  
                 const chatsSnapshot = await getDocs(chatsRef);
                 
                 const [usersRefsnapshot, chatsRefsnapshot] = await Promise.all([
@@ -225,17 +259,19 @@ const UserAccount = () => {
                 console.log(filteredArray)
                 console.log(chatIdsArray)
                 console.log(filteredArray && filteredArray.length)
-
+  
                 setChats(filteredArray && filteredArray.length)
     
                 console.log('Users:', usersArray);
                 console.log('Chats:', chatsArray);
+
+                console.log(authUser)
     
-                const otherUsers = usersArray.filter(user => user.displayName !== authUser.displayName);
+                const otherUsers = usersArray.filter(user => user.email !== authUser.email);
                 setFoundUsers(otherUsers);
-
+  
                 console.log(otherUsers)
-
+  
                 
                 const newarray = [];
                 const sendersarray = [];
@@ -245,7 +281,7 @@ const UserAccount = () => {
                     newarray.push(getUsersById(otherUsers, i)[0]) //This is to extract other users merged in a chat with the current authenticated User
                     console.log(newarray)
                     setConnects(newarray)
-
+  
                     otherUsers.forEach(async(user)=>{
                       const chatDocId = [isSent || authUser.uid, user.userId].sort().join('_');
                       
@@ -254,27 +290,36 @@ const UserAccount = () => {
                       
                       if (notificationRefSnapshot.exists()){
                         console.log(notificationRefSnapshot.data())
-                        const unsubscribe = onSnapshot(notificationRef, (snapshot) => {
-                          if (snapshot){
-                            const data = snapshot.data()
+  
+                        const msgCollections = collection(db, 'chats', chatDocId, 'messages')
+                        const q = query(msgCollections, where('recipientId', '==', authUser.uid ))
+                        
+                        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+                          const newNotifications = [];
+                          querySnapshot.docChanges().forEach((change) => {
+                            if (change.type === 'added' ) {
+                              newNotifications.push({ id: change.doc.id, ...change.doc.data() });
+                              // alert('New Changes made')
+                              // setNotificationSenders(senders)
+                              // startTransitionAlert(() =>{
+                                setSent(authUser.uid)
+                                setAlert(isSent)
+                            //  })
+                              
+                              console.log(notificationRefSnapshot.data)
+                            }
+                          });
+                          //setNotifications(prevNotifications => [...prevNotifications, ...newNotifications]);
+                        
                             
-                            senders = (filterConnectsBySenderId(newarray, data.sender))
-                            console.log(senders)
-                            console.log(isSent)
-                            
-                            setNotificationSenders(senders)
-                            startTransitionAlert(() =>{
-                              setAlert(isSent)
-                            })
-                            
-                            console.log(notificationRefSnapshot.data)
+                           
     
                             // updateDoc(notificationRef, {
                             //   notification: '',
                             //   // or use this to mark it as read
                             //   // read: true,
                             // });
-                          }
+                          
                           
                         })
                         
@@ -293,16 +338,14 @@ const UserAccount = () => {
         };
         console.log(isSent)
         getUsersAndChats();
-      }, [authO, formData, isSent, chats, isAlert]);
+      }, [auth, isSent, session, status]);
 
   //////
 
-
-
-  const renderContent = ({allMessages, user, chats, mergedIds, isPendingLikes, formData}) => {
+  const renderContent = ({isPendingAlert, isAlert, isSent, allMessages, user, chats, mergedIds, isPendingLikes, formData}) => {
     switch (selectedTab) {
       case 'profile':
-        return <div><Profile notificationSenders={notificationSenders} setToggle={setToggle} toggle={toggle} connects={connects} allMessages={allMessages} isPendingLikes={isPendingLikes} mergedIds={mergedIds} chats={chats} pendingUsers={pendingUsers} foundUsers={foundUsers} isProfileActive={selectedTab === 'profile'} pickupData={pickupData} setPickupData={setPickupData} user={user} dataFetched={dataFetched} setDataFetched={setDataFetched} startTransition={startTransition} formData={formData} setFormData={setFormData} isPending={isPending} authO={authO} /></div>;
+        return <div><Profile startTransitionAlert={startTransitionAlert} setAlert={setAlert} isAlert={isAlert} isSent={isSent} isPendingAlert={isPendingAlert} notificationSenders={notificationSenders} setToggle={setToggle} toggle={toggle} connects={connects} allMessages={allMessages} isPendingLikes={isPendingLikes} mergedIds={mergedIds} chats={chats} pendingUsers={pendingUsers} foundUsers={foundUsers} isProfileActive={selectedTab === 'profile'} pickupData={pickupData} setPickupData={setPickupData} user={user} dataFetched={dataFetched} setDataFetched={setDataFetched} startTransition={startTransition} formData={formData} setFormData={setFormData} isPending={isPending} authO={authO} /></div>;
       case 'pickups':
         return <Pickups user={user} formData={formData} />;
       case 'update':
@@ -357,13 +400,13 @@ const UserAccount = () => {
         </nav>
       </aside>
       <main className="flex-1 p-8 bg-gray-100">
-        {renderContent({user, chats, mergedIds, isPendingLikes, connects, toggle, setToggle, formData})}
+        {renderContent({isPendingAlert, isSent, isAlert, user, chats, mergedIds, isPendingLikes, connects, toggle, setToggle, formData})}
       </main>
     </div>
   );
 };
 
-const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, chats, user, isPendingLikes, pendingUsers, foundUsers,  isProfileActive, pickupData, formData, isPending, setFormData, setPickupData, authO,  startTransition, dataFetched, setDataFetched}) => {
+const Profile = ({isPendingAlert, isAlert, isSent, startTransitionAlert, setAlert, notificationSenders, toggle, connects, setToggle, mergedIds, chats, user, isPendingLikes, pendingUsers, foundUsers,  isProfileActive, pickupData, formData, isPending, setFormData, setPickupData, authO,  startTransition, dataFetched, setDataFetched}) => {
   
   useEffect(() => {
     if (isProfileActive) { // Fetch only if Profile tab is active
@@ -378,6 +421,10 @@ const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, c
             const pickupRef = doc(db, 'pickups', userPid);
             const pickupRefsnapshot = await getDoc(pickupRef);
             const userRefsnapshot = await getDoc(userRef);
+
+            startTransitionAlert(() =>{
+              setAlert(isSent)
+            })
   
             if (pickupRefsnapshot.exists()) {
                 const pickupdata = pickupRefsnapshot.data();
@@ -392,7 +439,7 @@ const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, c
     }
     // fetchUserData();
   
-  }, [isProfileActive, formData.photoURL, authO])
+  }, [isProfileActive, formData.photoURL, authO, isAlert, isSent])
 
   function convert24To12(time24) {
     const [hours, minutes] = time24.split(':');
@@ -407,6 +454,48 @@ const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, c
     };
   
     return date.toLocaleString('en-US', options);
+  }
+
+  const bindUsersById = async(email) => {
+    try{
+      const auth = getAuth(app)
+    const authUser = auth.currentUser
+    const allUsersSnapshot = await getDocs(collection(db, 'users'));
+    const users = allUsersSnapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+    const recipient = users.find(u => u.email === decodeURIComponent(email));
+      if (recipient) {
+    const chatId = `${authUser.uid}_${recipient.userId}`
+    console.log(chatId)
+    const messageRef = collection(db, 'chats', chatId, 'messages')
+        const q = query(messageRef, where("recipientId", "==", authUser && authUser.uid), where("isRead", "==", false))
+
+        const unsubscribe = onSnapshot(q, (querySnapshot) => {
+            querySnapshot.docChanges().forEach((change) => {
+                if (change.type === 'added') {
+                    console.log('New message:', change.doc.data());
+                    // alert('Changes made')
+                    // Handle the new message notification here
+                  }
+            })
+        })
+      await addDoc(collection(db, 'chats', chatId, 'messages'), {
+        // text: "Hello",
+        isRead: false,
+        senderId: authUser && authUser.uid,
+        recipientId: recipient && recipient.userId,
+        timestamp: serverTimestamp(),
+      });
+      // setInput('');
+      // setSent(recipientUser.userId)
+    //   console.log(isSent)
+
+    return () => unsubscribe()
+    }
+    }
+    catch(err){
+      console.error(err.message, "Unable to bind Users")
+    }
   }
   
    
@@ -437,15 +526,16 @@ const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, c
             ) : (
               <FaUserCircle size={50} className="text-gray-700 z-10" />
             )}
-            <h2 className="text-xl font-bold mt-4">{formData.name}</h2>
+            <h2 className="text-xl font-bold mt-4">{formData && formData.name}</h2>
             <p className="text-gray-600">{formData.email}</p>
             <p className="text-gray-600">{formData.phone}</p>
-            {console.log(connects)}
-            {isPendingLikes && isPendingAlert? <p>Loading</p>:
+            {console.log(connects && connects)}
+            {console.log(notificationSenders && notificationSenders)}
+            {isPendingAlert? <p>Loading</p>:
             <div className='flex flex-col items-center gap-y-4'>
               <p className='uppercase font-bold'>{`${formData.name} has ${chats && chats} connect${chats<2?'':'s'}`}</p>
               <div className='relative flex items-center '>
-              {notificationSenders && Array.from(notificationSenders).map(sender=>{
+              {(notificationSenders && connects) && connects.map(sender=>{
                 return (
                   
                   <div className='relative'>
@@ -462,23 +552,24 @@ const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, c
                 )
               })}
               </div>
-              {((Array.from(notificationSenders))[(Array.from(notificationSenders)).length - 1] !== undefined) && <span>These have sent notifications. Please check chat arena.</span>}
+              {/* {((Array.from(notificationSenders))[(Array.from(notificationSenders)).length - 1] !== undefined) && <span>These have sent notifications. Please check chat arena.</span>} */}
+              {(connects.length > 0) && <span>These have sent notifications. Please check chat arena.</span>}
             </div>
             }
             <div className='relative '>
             {<span className='relative cursor-pointer' onMouseEnter={()=>setToggle(true)} onMouseOut={()=>setToggle(false)}>CHECK FRIENDS</span>}
             {toggle && 
               <div className='shadow-md rounded-md absolute z-10 flex flex-col items-start bg-black text-white pl-4 pr-4 w-[200px]' >
-                {connects && connects.map(item => {return <li className='cursor-pointer' key={item.userId}>{item.displayName.toUpperCase()}</li>})}
+                {notificationSenders||connects && notificationSenders.map(item => {return <li className='cursor-pointer' key={item.userId}>{item.displayName.toUpperCase()}</li>})}
               </div>}
             </div>
-            {pendingUsers && isPending?
+            {isPending?
                     <FaSpinner className="animate-spin mx-auto text-black"/> 
                     : <div>
-                        {foundUsers && 
+                        {
                         <ul className='bg-gray-200 rounded-2xl w-full grid p-8 grid-cols-3 shadow-2xl border xsm:max-lg:grid-cols-2 xsm:max-[400px]:grid-cols-1 xsm:max-[400px]:min-w-[280px]'>
                           <h1 className='font-extrabold text-xl col-span-3 pb-4 text-center xsm:max-lg:col-span-2 auto-cols-fr'>CONNECT AND CHAT</h1>
-                          {foundUsers.map((user)=>{
+                          {foundUsers && foundUsers.map((user)=>{
                             return(
                               <div className='bg-white flex items-center gap-4 border rounded-2xl shadow-md p-4 flex-col justify-between xsm:max-[670px]:col-span-2 xsm:max-lg:col-span-1 '>
                                 <div className='overflow-hidden'>
@@ -487,8 +578,8 @@ const Profile = ({notificationSenders, toggle, connects, setToggle, mergedIds, c
                                   :<p className='rounded-full shadow-lg flex items-center justify-center bg-black text-white w-[50px] h-[50px]'>{user.displayName[0]}</p>}
                                 </div>
                                 {/* {console.log(chats && chats.length>0? chats:"Nothing")} */}
-                                <li className='font-bold text-[17px] text-center'>{user.displayName}</li>
-                                <Link href={`/chat/${encodeURIComponent(user.email)}`} className='flex items-center gap-x-2'><FaEnvelopeOpenText/> Chat</Link>
+                                <li className='font-bold text-[17px] text-center'>{user && user.displayName}</li>
+                                <Link href={`/chat/${encodeURIComponent(user && user.email)}`} className='flex items-center gap-x-2'><FaEnvelopeOpenText/> Chat</Link>
                                 {/* <li className='font-[Poppins] text-[15px] p-4'>{user.email}</li> */}
                                 
                               </div>

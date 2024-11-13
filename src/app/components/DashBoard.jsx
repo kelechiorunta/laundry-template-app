@@ -70,7 +70,7 @@ export default function Dashboard() {
         })
       }
       getcurrentUser()
-    },[authO])
+    },[authO, userEmail])
 
   
 
@@ -84,6 +84,7 @@ export default function Dashboard() {
         if (authProfileUser){
           await updateProfile(authProfileUser, {
             displayName: formData && formData.name,
+            // email: formData && formData.email,
             phoneNumber: formData && formData.phone,
             photoURL: formData && `${formData.photo || photoURL}`, // Uncomment if you want to update the photo URL
           });
@@ -93,7 +94,9 @@ export default function Dashboard() {
   
                     // Prepare the data for Firestore
           const updateData = {
+            userId: userid,
             displayName: formData && formData.name ,
+            email: formData && formData.email || '',
             phone: formData && formData.phone || '',
             address: formData && formData.address || '',
             date: formData && formData.date || '' ,

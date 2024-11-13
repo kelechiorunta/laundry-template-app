@@ -8,8 +8,11 @@ import { authUserEmail } from "../server actions/server actions";
 import { closeSession } from "../server actions/server actions";
 import { FaUserTag, FaTimes} from "react-icons/fa";
 import { useState, useEffect } from "react";
-import { signOut, getAuth, onAuthStateChanged } from "firebase/auth";
+import { signOut as firebaseSignOut, getAuth, onAuthStateChanged } from "firebase/auth";
+import { signOut as nextAuthSignOut } from "next-auth/react";
 import { doc, getDoc} from "firebase/firestore";
+import { useSession } from 'next-auth/react'
+
 
 // import { auth } from "../firebase/firebaseConfig";
 import { useRouter } from "next/navigation";
@@ -42,19 +45,20 @@ export default function LaundryHeader() {
   const [toggle, setToggle] = useState(false)
   const [toggleMenu, setMenuToggle] = useState(false)
 
-
-
-  // startTransitionProfile(async()=>{
-  // onAuthStateChanged(auth, (currentUser) => {
-  //   setUser(currentUser); 
-  // });
-  // })
-
-  // const auth = getAuth(app)
-
+  const { data: session, status } = useSession();
+  
   const router = useRouter()
 
   useEffect(()=>{
+    
+    console.log(session)
+    // Log the image URL for debugging
+    session && console.log('User Image URL:', session?.user?.image);
+    
+    if (session && status=='authenticated'){
+      session && setUserphoto(session?.user?.picture)
+      console.log(userA)
+    }
     
     const getcurrentUser = () =>{
       startTransitionProfile(async()=>{
@@ -81,7 +85,7 @@ export default function LaundryHeader() {
       
     }
     getcurrentUser()
-  },[])
+  },[session, status, userA])
 
   const clearCookies = () => {
     document.cookie.split(";").forEach((c) => {
@@ -106,7 +110,8 @@ export default function LaundryHeader() {
     let timerId
     try{
       clearCookies()
-      await signOut(auth); 
+      await firebaseSignOut(auth); 
+      await nextAuthSignOut()
       setAuthObject(prevState => ({ ...prevState, status: "User Logged Out"}));
       setLoggedOut(true)
       console.log(setAuthObject.status)
@@ -134,9 +139,11 @@ export default function LaundryHeader() {
             <div className="flex flex-col w-3/12 max-md:ml-0 max-md:w-full">
               <Image
                 src={logo}
+                width={50}
+                height={50}
                 loading="lazy"
                 // srcSet="https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=100 100w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=200 200w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=400 400w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=800 800w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=1200 1200w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=1600 1600w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded?width=2000 2000w, https://cdn.builder.io/api/v1/image/assets%2F661e1fa212c74d1c94d19e320025bbf6%2Ffe4e5f3cc6494e3f9d1c3dd18cc1fded"
-                className="box-border rounded-full object-cover overflow-hidden shrink-0 mt-0 mb-auto aspect-square h-[70px] min-h-[70px] min-w-[70px] w-[70px] max-md:w-16 max-md:h-16"
+                className="box-border rounded-full object-cover overflow-hidden shrink-0 mt-0 mb-auto aspect-square h-[50px] min-h-[50px] min-w-[50px] w-[50px] max-md:w-16 max-md:h-16"
               />
             </div>
             <div className="flex flex-col ml-5 w-3/12 max-md:ml-0 max-md:w-full">
@@ -202,18 +209,18 @@ export default function LaundryHeader() {
                       <div className="flex gap-5 max-md:flex-col max-md:gap-0">
 
                         
-                        {(userA)? 
+                        {(userA) || (session && status=='authenticated')? 
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
-                            <Link
+                            <button
                             onClick={clearAuth}
-                            href={'/login'}
+                            // href={'/login'}
                             disabled={isPending}
                               className="box-border relative shrink-0 px-6 py-2 mt-7 w-[100px] text-center rounded border border-[#1665F8] appearance-none cursor-pointer text-[white] bg-[#1665F8] hover:text-[#1665F8] transition-all hover:bg-white "
                               // openLinkInNewTab={false}
                             >
                               {isPending ? <FaSpinner className="animate-spin mx-auto w-[20px] h-[20px]"/> : 'Logout'}
                               
-                            </Link>
+                            </button>
                           </div> :
                           <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
                             <Link
@@ -224,8 +231,24 @@ export default function LaundryHeader() {
                               Login
                             </Link>  
                         </div>}
+
+                        <div className=" relative w-[50px] h-[50px] flex items-end justify-center mt-6 text-center top-0 rounded-full black bg-[#082f49] text-white">
+                            {console.log(session && session?.user?.image)}
+                            
+                            <img
+                              className="w-[50px] h-[50px] m-auto flex items-center justify-center rounded-full absolute "
+                              src={session && session.user.picture} // Directly assign session.user.image to img src
+                              alt={session && session.user.name[0]}
+                              width={50}
+                              height={50}
+                            /> 
+                            {/* || */}
+                            <p className="w-[50px] h-[50px] m-auto items-center justify-center ">
+                              {session && session.user.name[0]}
+                            </p>
+                        </div> 
                           
-                        <div className="flex flex-col w-full max-md:ml-0 max-md:w-full">
+                        <div className="flex flex-col w-full -mt-1 max-md:ml-0 max-md:w-full">
                             {!(userA )? <FaUserTag className="mt-6 rounded-full border shadow-lg" size={50}/>:
                             
                             <button
@@ -241,7 +264,7 @@ export default function LaundryHeader() {
                               {/* {console.log(userA && userA)} */}
                               {isPendingProfile? <FaSpinner className="animate-spin mx-auto fill-white w-[100%] h-[50px]"/>: //: `${user === null? "" : user && (user?.email) && (user?.email)[0].toUpperCase()}`}
                               <div className={` flex items-center justify-center text-center border top-0 border-white rounded-2xl black bg-[#082f49] text-white`}>
-                                  {!toggle ? <img src={user_photo} className="absolute w-[50px] h-[50px] overflow-hidden rounded-full" width={50} height={50} alt="pic"/>
+                                  {!toggle ? <img src={(session || userA) && user_photo} className="absolute w-[50px] h-[50px] overflow-hidden rounded-full" width={50} height={50} alt={session && session?.user?.name[0]}/>
                                   :
                                   <p className="rounded-full px-5 py-3 absolute text-xl overflow-hidden bg-[#082f49]">{user && (user?.email) && (user?.email)[0].toUpperCase()}</p>
                                   // :<p

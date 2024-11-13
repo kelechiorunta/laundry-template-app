@@ -1,6 +1,9 @@
 import { Inter, Poppins } from "next/font/google";
 import "./globals.css";
 import AuthComponent from "./components/AuthComponent";
+import { Providers } from "./components/Providers";
+import Template from "./template";
+import LaundryHeader from "./components/LaundryHeader";
 
 const inter = Inter({ subsets: ["latin"] });
 const poppins = Poppins({ subsets: ["latin"], weight: '400' });
@@ -14,11 +17,15 @@ export default function RootLayout({ children, chatslot }) {
   return (
     <html lang="en">
       <body className={poppins.className}>
-      <AuthComponent>
-        <div>{chatslot}</div>
-        <div>{children}</div>
-        
-      </AuthComponent>
+        <Providers>
+          <AuthComponent>
+          <div className="w-screen fixed top-0 z-50 "><LaundryHeader/></div>
+            <Template>
+              {/* <div>{chatslot}</div> */}
+              <div>{children}</div>
+            </Template>
+          </AuthComponent>
+        </Providers>
       </body>
     </html>
   );

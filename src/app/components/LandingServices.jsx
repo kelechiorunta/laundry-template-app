@@ -22,7 +22,7 @@ export default function LandingServices() {
       scrollTrigger: {
         trigger: element,
         start: 'top', // When the top of the trigger hits the bottom of the viewport
-        end: 'bottom top', // When the bottom of the trigger hits the top of the viewport
+        end: 'middle', // When the bottom of the trigger hits the top of the viewport
         scrub: 3,
          pin: true,
       },
@@ -48,11 +48,11 @@ export default function LandingServices() {
     elements.forEach((element, index) => {
       ScrollTrigger.create({
         trigger: triggerServiceRef.current,
-        start: 'top 150px',
-        end: 'bottom',
+        start: 'top',
+        end: 'middle',
         onEnter: () => {
          gsap.fromTo(element, {
-            x: -200, // Final position
+            x: 0, // Final position
             opacity: 0, // Final opacity
             duration: 2,
             delay: index * 0.2, // Stagger the animations
@@ -67,7 +67,7 @@ export default function LandingServices() {
         },
         onLeaveBack: () => {
           gsap.to(element, {
-            x: -200, // Initial position
+            x: 0, // Initial position
             opacity: 0, // Initial opacity
             duration: 1,
             delay: index * 0.5,

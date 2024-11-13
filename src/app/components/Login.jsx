@@ -1,7 +1,7 @@
 'use client'
 import { useState, useContext, useEffect, startTransition } from 'react';
 import { app, auth } from '../firebase/firebaseConfig';
-import { signInWithEmailAndPassword, getAuth, signOut, onAuthStateChanged } from 'firebase/auth';
+import { signInWithEmailAndPassword, getAuth, signOut, onAuthStateChanged, signInWithCredential, linkWithCredential } from 'firebase/auth';
 import { FaEnvelope, FaLock } from 'react-icons/fa';
 import { getLoginCredentials, validateAuth } from '../server actions/server actions';
 import axios from 'axios';
@@ -13,6 +13,7 @@ import { authUserEmail } from '../server actions/server actions';
 import { authContext } from './AuthComponent';
 import { FaSpinner } from 'react-icons/fa';
 import { useTransition } from 'react';
+import GoogleSignInButton from './GoogleSignInButton';
 
 
 const Login = () => {
@@ -51,13 +52,31 @@ const Login = () => {
       })      
     }
     revalidateAuth()
-  },[status])
+  },[])
+
+  const linkEmailWithGoogle = async (email, password, googleAccessToken) => {
+    const auth = getAuth(app);
+  
+    try {
+      // Step 1: Sign in with email and password
+      const emailCredential = EmailAuthProvider.credential(email, password);
+      const emailUserCredential = await signInWithCredential(auth, emailCredential);
+  
+      // Step 2: Create Google credential with the access token
+      const googleCredential = GoogleAuthProvider.credential(null, googleAccessToken);
+  
+      // Step 3: Link Google account to the email/password account
+      const linkedUser = await linkWithCredential(emailUserCredential.user, googleCredential);
+      console.log('Linked successfully:', linkedUser);
+    } catch (err) {
+      console.error('Error linking Google with email:', err.message);
+    }
+  };
 
   const handleLogin = (e) =>{
     startTransitionLogin(async() => {
       e.preventDefault();
-    try {
-        
+    try {  
       const auth = getAuth(app)
       const userCredential = await signInWithEmailAndPassword(auth, email, password);
       const token = await userCredential.user.getIdToken();
@@ -76,21 +95,6 @@ const Login = () => {
       console.log(await validateAuth())
       window.location.href = '/'
       
-          // Create a new NextResponse object and set the cookie
-          //const response = NextResponse.json({ message: 'Login successful' , location: '/'});
-      // const response = await axios.post('/api/login', { email, password },{
-      //   headers: {
-      //     'Content-Type': 'application/json',
-      //   },
-      // })
-      // const user = response.data
-      //router.push(response.data.location || '/')
-       //window.location.href = '/'//response.data.location
-      // console.log(userCredential.user)
-      // await signInWithEmailAndPassword(auth, email, password);
-      // alert('Login successful');
-      // setAuth(auth)
-      // console.log(response)
     } catch (err) {
       setError(err.message);
     }
@@ -132,7 +136,8 @@ const Login = () => {
         {/* {console.log(V)} */}
         {/* {isPending? <h1>Loading...</h1> : <p>{V}</p>} */}
         {/* {status && <p className="text-blue-500 text-center">{status}</p>} */}
-        <form onSubmit={handleLogin} 
+        <div 
+        // onSubmit={handleLogin} 
         //action={getLoginCredentials}
         className="space-y-4">
           <div className="flex items-center border-b border-gray-300 py-2">
@@ -158,12 +163,15 @@ const Login = () => {
             />
           </div>
           <button
+          onClick={handleLogin}
             disabled={isPendingLogin}
-            type="submit"
+            type="button"
             className="w-full bg-indigo-500 text-white py-2 px-4 rounded-lg hover:bg-indigo-600 focus:outline-none focus:bg-indigo-600"
           >
             {isPendingLogin? <FaSpinner className="animate-spin mx-auto"/> : 'Login'}
           </button>
+
+          
           {/* <button
             disabled={isPendingLogout}
             onClick={handlelogOut}
@@ -172,7 +180,8 @@ const Login = () => {
           >
             {isPendingLogout? <FaSpinner className="animate-spin mx-auto"/> : 'Logout'}
           </button> */}
-        </form>
+        </div>
+        <GoogleSignInButton linkEmailWithGoogle={linkEmailWithGoogle}/>
         <p className="text-center mt-4 text-gray-600">
           Don't have an account? <a href="/signup" className="text-indigo-500">Sign up</a>
         </p>

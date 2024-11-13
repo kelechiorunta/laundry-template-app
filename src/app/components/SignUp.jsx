@@ -75,13 +75,13 @@ const Signup = () => {
   }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center text-black min-h-screen bg-gray-100">
       <div className="bg-white p-6 rounded-lg shadow-lg w-full max-w-md">
         <h2 className="text-2xl font-bold text-center mb-6">Sign Up</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
         <form onSubmit={createUser}
           className="space-y-4">
-          <div className="flex items-center border-b border-gray-300 py-2">
+          <div className="flex items-center border-b text-black border-gray-300 py-2">
             <FaUser className="text-gray-500 mr-3" />
             <input 
               required

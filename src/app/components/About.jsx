@@ -45,8 +45,8 @@ export default function About() {
     elements.forEach((element, index) => {
       ScrollTrigger.create({
         trigger: triggerRef.current,
-        start: 'top 650px',
-        end: 'bottom',
+        start: 'top',
+        end: 'middle',
         onEnter: () => {
           gsap.to(element, {
             x: 0, // Final position
